@@ -5,17 +5,17 @@ supported_roms = {
     functions = {
       read_game_vars = function ()
         -- frame number
-        frame_number = memory.readdword(0x02007F00)
+        gamestate.frame_number = memory.readdword(0x02007F00)
 
         -- is in match
         -- I believe the bytes that are expected to be 0xff means that a character has been locked, while the byte expected to be 0x02 is the current match state. 0x02 means that round has started and players can move
         local p1_locked = memory.readbyte(0x020154C6);
         local p2_locked = memory.readbyte(0x020154C8);
         local match_state = memory.readbyte(0x020154A7);
-        local _previous_is_in_match = is_in_match
+        local _previous_is_in_match = gamestate.is_in_match
         if _previous_is_in_match == nil then _previous_is_in_match = true end
-        is_in_match = ((p1_locked == 0xFF or p2_locked == 0xFF) and match_state == 0x02);
-        has_match_just_started = not _previous_is_in_match and is_in_match
+        gamestate.is_in_match = ((p1_locked == 0xFF or p2_locked == 0xFF) and match_state == 0x02);
+        has_match_just_started = not _previous_is_in_match and gamestate.is_in_match
       end,
     }
   },
@@ -29,16 +29,16 @@ supported_roms = {
     functions = {
       read_game_vars = function ()
         -- frame number
-        frame_number = memory.readdword(0x02007F00) -- FIXME
+        gamestate.frame_number = memory.readdword(0x02007F00) -- FIXME
 
         -- is in match
-        local _previous_is_in_match = is_in_match
+        local _previous_is_in_match = gamestate.is_in_match
         if _previous_is_in_match == nil then _previous_is_in_match = true end
-        is_in_match = (memory.readword(0xFF847F) ~= 0)
-        has_match_just_started = not _previous_is_in_match and is_in_match
-        --~ print(frame_number .. " " .. tostring(_previous_is_in_match) .. " " .. tostring(is_in_match))
+        gamestate.is_in_match = (memory.readword(0xFF847F) ~= 0)
+        has_match_just_started = not _previous_is_in_match and gamestate.is_in_match
+        --~ print(gamestate.frame_number .. " " .. tostring(_previous_is_in_match) .. " " .. tostring(gamestate.is_in_match))
         --~ TODO:
-        --~ Voir quand ya besoin ou pas que is_in_match soit true
+        --~ Voir quand ya besoin ou pas que gamestate.is_in_match soit true
       end,
     }
   },

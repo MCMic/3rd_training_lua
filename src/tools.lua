@@ -161,7 +161,7 @@ function log(_section_name, _category_name, _event_name)
   if not log_enabled then return end
 
   if log_categories_display[_category_name] and log_categories_display[_category_name].print then
-    print(string.format("%d - [%s][%s] %s", frame_number, _section_name, _category_name, _event_name))
+    print(string.format("%d - [%s][%s] %s", gamestate.frame_number, _section_name, _category_name, _event_name))
   end
 
   if not log_recording_on then return end
@@ -180,9 +180,9 @@ function log(_section_name, _category_name, _event_name)
   end
 
   -- Insert frame if it does not exists
-  if #logs == 0 or logs[#logs].frame ~= frame_number then
+  if #logs == 0 or logs[#logs].frame ~= gamestate.frame_number then
     table.insert(logs, {
-      frame = frame_number,
+      frame = gamestate.frame_number,
       events = {}
     })
   end

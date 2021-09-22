@@ -104,7 +104,7 @@ function process_pending_input_sequence(_player_obj, _input)
   if is_menu_open then
     return
   end
-  if not is_in_match then
+  if not gamestate.is_in_match then
     return
   end
 
@@ -623,7 +623,7 @@ function backup_recordings()
 end
 
 function restore_recordings()
-  local _char = player_objects[2].char_str
+  local _char = gamestate.player_objects[2].char_str
   if _char and _char ~= "" then
     local _recording_count = #recording_slots
     if training_settings.recordings then
@@ -666,7 +666,7 @@ if current_recording_state == 4 then -- Replaying
 end
 
   -- pose
-if is_in_match and not is_menu_open and not is_playing_input_sequence(_player_obj) then
+if gamestate.is_in_match and not is_menu_open and not is_playing_input_sequence(_player_obj) then
   local _on_ground = is_state_on_ground(_player_obj.standing_state, _player_obj)
   local _is_waking_up = _player_obj.is_wakingup and _player_obj.is_past_wakeup_frame
 
@@ -871,7 +871,7 @@ function update_blocking(_input, _player, _dummy, _mode, _style, _red_parry_hit_
     memory.writebyte(_player_obj.parry_antiair_cooldown_time_addr, 0)
   end
 
-  if not is_in_match then
+  if not gamestate.is_in_match then
     return
   end
 
@@ -933,14 +933,14 @@ function update_blocking(_input, _player, _dummy, _mode, _style, _red_parry_hit_
 
       log(_dummy.prefix, "blocking", string.format("listening %s", _player.relevant_animation))
       if _debug then
-        print(string.format("%d - %s listening for attack animation \"%s\" (starts at frame %d)", frame_number, _dummy.prefix, _player.relevant_animation, _player.relevant_animation_start_frame))
+        print(string.format("%d - %s listening for attack animation \"%s\" (starts at frame %d)", gamestate.frame_number, _dummy.prefix, _player.relevant_animation, _player.relevant_animation_start_frame))
       end
     else
       -- unknown animation, stop listening
       if _dummy.blocking.listening then
         log(_dummy.prefix, "blocking", string.format("stopped listening"))
         if _debug then
-          print(string.format("%d - %s stopped listening for attack animation", frame_number, _dummy.prefix))
+          print(string.format("%d - %s stopped listening for attack animation", gamestate.frame_number, _dummy.prefix))
         end
         stop_listening_hits(_dummy)
       end
@@ -986,11 +986,11 @@ function update_blocking(_input, _player, _dummy, _mode, _style, _red_parry_hit_
       else
         t_assert(false, string.format("unknown hit id, what is happening ? (anim:%s, hit:%d)", _player.relevant_animation, _dummy.blocking.expected_attack_hit_id))
       end
-      local _frame = frame_number - _player.current_animation_start_frame - _player.current_animation_freeze_frames
+      local _frame = gamestate.frame_number - _player.current_animation_start_frame - _player.current_animation_freeze_frames
       _hit_expired = _frame > _last_hit_frame
     end
   end
-  if _dummy.blocking.should_block_projectile and _dummy.blocking.projectile_hit_frame < frame_number then
+  if _dummy.blocking.should_block_projectile and _dummy.blocking.projectile_hit_frame < gamestate.frame_number then
     _hit_expired = true
   end
 
@@ -1026,7 +1026,7 @@ function update_blocking(_input, _player, _dummy, _mode, _style, _red_parry_hit_
     if _player.highest_hit_id == 0 and _dummy.blocking.last_attack_hit_id > 0 and _player.remaining_freeze_frames == 0 then
       log(_dummy.prefix, "blocking", string.format("reset hits"))
       if _debug then
-        print(string.format("%d - reset last hit (%d, %d)", frame_number, _player.highest_hit_id, _dummy.blocking.last_attack_hit_id))
+        print(string.format("%d - reset last hit (%d, %d)", gamestate.frame_number, _player.highest_hit_id, _dummy.blocking.last_attack_hit_id))
       end
       _dummy.blocking.last_attack_hit_id = 0
       _dummy.blocking.expected_attack_hit_id = 0
@@ -1039,7 +1039,7 @@ function update_blocking(_input, _player, _dummy, _mode, _style, _red_parry_hit_
       reset_parry_cooldowns(_dummy)
     end
 
-    --if (_dummy.blocking.expected_attack_animation_hit_frame < frame_number or _dummy.blocking.last_attack_hit_id == _dummy.blocking.expected_attack_hit_id) then
+    --if (_dummy.blocking.expected_attack_animation_hit_frame < gamestate.frame_number or _dummy.blocking.last_attack_hit_id == _dummy.blocking.expected_attack_hit_id) then
     if (_dummy.blocking.expected_attack_hit_id == 0 and not _dummy.blocking.should_block) then
       local _max_prediction_frames = 3
       for i = 1, _max_prediction_frames do
@@ -1092,14 +1092,14 @@ function update_blocking(_input, _player, _dummy, _mode, _style, _red_parry_hit_
                 if _r > 0.5 then
                   _dummy.blocking.randomized_out = true
                   if _debug then
-                    print(string.format(" %d: next hit randomized out", frame_number))
+                    print(string.format(" %d: next hit randomized out", gamestate.frame_number))
                   end
                 end
               end
             end
 
             if _debug then
-              print(string.format(" %d: next hit %d at frame %d (%d), last hit %d", frame_number, _dummy.blocking.expected_attack_hit_id, _predicted_hit.frame, _dummy.blocking.expected_attack_animation_hit_frame, _dummy.blocking.last_attack_hit_id))
+              print(string.format(" %d: next hit %d at frame %d (%d), last hit %d", gamestate.frame_number, _dummy.blocking.expected_attack_hit_id, _predicted_hit.frame, _dummy.blocking.expected_attack_animation_hit_frame, _dummy.blocking.last_attack_hit_id))
             end
 
             break
@@ -1165,7 +1165,7 @@ function update_blocking(_input, _player, _dummy, _mode, _style, _red_parry_hit_
             _dummy.blocking.should_block_projectile = true
             _dummy.blocking.projectile_randomized_out = false
             _dummy.blocking.has_pre_parried = false
-            _dummy.blocking.projectile_hit_frame = frame_number + _i
+            _dummy.blocking.projectile_hit_frame = gamestate.frame_number + _i
             _dummy.blocking.expected_projectile = _projectile_obj
             _dummy.blocking.is_precise_timing = _movement ~= nil
             log(_dummy.prefix, "blocking", string.format("block proj %s in %d", _projectile_obj.id, _i))
@@ -1180,7 +1180,7 @@ function update_blocking(_input, _player, _dummy, _mode, _style, _red_parry_hit_
                 if _r > 0.5 then
                   _dummy.blocking.projectile_randomized_out = true
                   if _debug then
-                    print(string.format(" %d: next hit randomized out", frame_number))
+                    print(string.format(" %d: next hit randomized out", gamestate.frame_number))
                   end
                 end
               end
@@ -1222,7 +1222,7 @@ function update_blocking(_input, _player, _dummy, _mode, _style, _red_parry_hit_
 
     local _animation_frame_delta = 0
     if _dummy.blocking.should_block_projectile then
-      _animation_frame_delta = _dummy.blocking.projectile_hit_frame - frame_number
+      _animation_frame_delta = _dummy.blocking.projectile_hit_frame - gamestate.frame_number
     else
       _animation_frame_delta = _dummy.blocking.expected_attack_animation_hit_frame - _player_relevant_animation_frame
     end
@@ -1235,7 +1235,7 @@ function update_blocking(_input, _player, _dummy, _mode, _style, _red_parry_hit_
       if _animation_frame_delta <= _blocking_delta_threshold then
         log(_dummy.prefix, "blocking", string.format("dummy block %d %d %d", _dummy.blocking.expected_attack_hit_id, to_bit(_dummy.blocking.should_block_projectile), _animation_frame_delta))
         if _debug then
-          print(string.format("%d - %s blocking", frame_number, _dummy.prefix))
+          print(string.format("%d - %s blocking", gamestate.frame_number, _dummy.prefix))
         end
 
         if not _dummy.flip_input then
@@ -1265,7 +1265,7 @@ function update_blocking(_input, _player, _dummy, _mode, _style, _red_parry_hit_
       if (_animation_frame_delta == 1) or (_animation_frame_delta == 2 and _dummy.blocking.has_pre_parried) then
         log(_dummy.prefix, "blocking", string.format("parry %d", _dummy.blocking.expected_attack_hit_id))
         if _debug then
-          print(string.format("%d - %s parrying", frame_number, _dummy.prefix))
+          print(string.format("%d - %s parrying", gamestate.frame_number, _dummy.prefix))
         end
 
         if _parry_low then
@@ -1283,7 +1283,7 @@ function update_blocking(_input, _player, _dummy, _mode, _style, _red_parry_hit_
 end
 
 function update_fast_wake_up(_input, _player, _dummy, _mode)
-  if is_in_match and _mode ~= 1 and current_recording_state ~= 4 then
+  if gamestate.is_in_match and _mode ~= 1 and current_recording_state ~= 4 then
     local _should_tap_down = _dummy.previous_can_fast_wakeup == 0 and _dummy.can_fast_wakeup == 1
 
     if _should_tap_down then
@@ -1299,7 +1299,7 @@ function update_counter_attack(_input, _attacker, _defender, _stick, _button)
 
   local _debug = false
 
-  if not is_in_match then return end
+  if not gamestate.is_in_match then return end
   if _stick == 1 and _button == 1 then return end
   if current_recording_state == 4 then return end
 
@@ -1333,17 +1333,17 @@ function update_counter_attack(_input, _attacker, _defender, _stick, _button)
 
   if _defender.has_just_parried then
     if _debug then
-      print(frame_number.." - init ca (parry)")
+      print(gamestate.frame_number.." - init ca (parry)")
     end
     log(_defender.prefix, "counter_attack", "init ca (parry)")
-    _defender.counter.attack_frame = frame_number + 15
+    _defender.counter.attack_frame = gamestate.frame_number + 15
     _defender.counter.sequence, _defender.counter.offset = make_input_sequence(stick_gesture[_stick], button_gesture[_button])
     _defender.counter.ref_time = -1
     handle_recording()
 
   elseif _defender.has_just_been_hit or _defender.has_just_blocked then
     if _debug then
-      print(frame_number.." - init ca (hit/block)")
+      print(gamestate.frame_number.." - init ca (hit/block)")
     end
     log(_defender.prefix, "counter_attack", "init ca (hit/block)")
     _defender.counter.ref_time = _defender.recovery_time
@@ -1356,17 +1356,17 @@ function update_counter_attack(_input, _attacker, _defender, _stick, _button)
       return
     end
     if _debug then
-      print(frame_number.." - init ca (wake up)")
+      print(gamestate.frame_number.." - init ca (wake up)")
     end
     log(_defender.prefix, "counter_attack", "init ca (wakeup)")
-    _defender.counter.attack_frame = frame_number + _defender.remaining_wakeup_time + 1 -- the +1 here means that there is an error somehere but I don't know where. the remaining wakeup time seems ok
+    _defender.counter.attack_frame = gamestate.frame_number + _defender.remaining_wakeup_time + 1 -- the +1 here means that there is an error somehere but I don't know where. the remaining wakeup time seems ok
     _defender.counter.sequence, _defender.counter.offset = make_input_sequence(stick_gesture[_stick], button_gesture[_button])
     _defender.counter.ref_time = -1
     handle_recording()
   elseif _defender.has_just_entered_air_recovery then
     clear_input_sequence(_defender)
     _defender.counter.ref_time = -1
-    _defender.counter.attack_frame = frame_number + 100
+    _defender.counter.attack_frame = gamestate.frame_number + 100
     _defender.counter.sequence, _defender.counter.offset = make_input_sequence(stick_gesture[_stick], button_gesture[_button])
     _defender.counter.air_recovery = true
     handle_recording()
@@ -1376,10 +1376,10 @@ function update_counter_attack(_input, _attacker, _defender, _stick, _button)
   if not _defender.counter.sequence then
     if _defender.counter.ref_time ~= -1 and _defender.recovery_time ~= _defender.counter.ref_time then
       if _debug then
-        print(frame_number.." - setup ca")
+        print(gamestate.frame_number.." - setup ca")
       end
       log(_defender.prefix, "counter_attack", "setup ca")
-      _defender.counter.attack_frame = frame_number + _defender.recovery_time + 2
+      _defender.counter.attack_frame = gamestate.frame_number + _defender.recovery_time + 2
 
       -- special character cases
       if _defender.is_crouched then
@@ -1403,18 +1403,18 @@ function update_counter_attack(_input, _attacker, _defender, _stick, _button)
     if _defender.counter.air_recovery then
       local _frames_before_landing = predict_frames_before_landing(_defender)
       if _frames_before_landing > 0 then
-        _defender.counter.attack_frame = frame_number + _frames_before_landing + 2
+        _defender.counter.attack_frame = gamestate.frame_number + _frames_before_landing + 2
       elseif _frames_before_landing == 0 then
-        _defender.counter.attack_frame = frame_number
+        _defender.counter.attack_frame = gamestate.frame_number
       end
     end
-    local _frames_remaining = _defender.counter.attack_frame - frame_number
+    local _frames_remaining = _defender.counter.attack_frame - gamestate.frame_number
     if _debug then
       print(_frames_remaining)
     end
     if _frames_remaining <= (#_defender.counter.sequence + 1) then
       if _debug then
-        print(frame_number.." - queue ca")
+        print(gamestate.frame_number.." - queue ca")
       end
       log(_defender.prefix, "counter_attack", string.format("queue ca %d", _frames_remaining))
       queue_input_sequence(_defender, _defender.counter.sequence, _defender.counter.offset)
@@ -1423,12 +1423,12 @@ function update_counter_attack(_input, _attacker, _defender, _stick, _button)
       _defender.counter.air_recovery = false
     end
   elseif button_gesture[_button] == "recording" and _defender.counter.recording_slot > 0 then
-    if _defender.counter.attack_frame <= (frame_number + 1) then
+    if _defender.counter.attack_frame <= (gamestate.frame_number + 1) then
       if training_settings.replay_mode == 2 or training_settings.replay_mode == 3 or training_settings.replay_mode == 5 or training_settings.replay_mode == 6 then
         override_replay_slot = _defender.counter.recording_slot
       end
       if _debug then
-        print(frame_number.." - queue recording")
+        print(gamestate.frame_number.." - queue recording")
       end
       log(_defender.prefix, "counter_attack", "queue recording")
       _defender.counter.attack_frame = -1
@@ -1444,10 +1444,10 @@ end
 function update_tech_throws(_input, _attacker, _defender, _mode)
   local _debug = false
 
-  if not is_in_match or _mode == 1 then
+  if not gamestate.is_in_match or _mode == 1 then
     _defender.throw.listening = false
     if _debug and _attacker.previous_throw_countdown > 0 then
-      print(string.format("%d - %s stopped listening for throws", frame_number, _defender.prefix))
+      print(string.format("%d - %s stopped listening for throws", gamestate.frame_number, _defender.prefix))
     end
     return
   end
@@ -1455,14 +1455,14 @@ function update_tech_throws(_input, _attacker, _defender, _mode)
   if _attacker.throw_countdown > _attacker.previous_throw_countdown then
     _defender.throw.listening = true
     if _debug then
-      print(string.format("%d - %s listening for throws", frame_number, _defender.prefix))
+      print(string.format("%d - %s listening for throws", gamestate.frame_number, _defender.prefix))
     end
   end
 
   if _attacker.throw_countdown == 0 then
     _defender.throw.listening = false
     if _debug and _attacker.previous_throw_countdown > 0  then
-      print(string.format("%d - %s stopped listening for throws", frame_number, _defender.prefix))
+      print(string.format("%d - %s stopped listening for throws", gamestate.frame_number, _defender.prefix))
     end
   end
 
@@ -1477,7 +1477,7 @@ function update_tech_throws(_input, _attacker, _defender, _mode)
     ) then
       _defender.throw.listening = false
       if _debug then
-        print(string.format("%d - %s teching throw", frame_number, _defender.prefix))
+        print(string.format("%d - %s teching throw", gamestate.frame_number, _defender.prefix))
       end
       local _r = math.random()
       if _mode ~= 3 or _r > 0.5 then
@@ -1984,12 +1984,12 @@ end
 function update_recording(_input)
 
   local _input_buffer_length = 11
-  if is_in_match and not is_menu_open then
+  if gamestate.is_in_match and not is_menu_open then
 
     -- manage input
     local _input_pressed = (not swap_characters and player.input.pressed.coin) or (swap_characters and dummy.input.pressed.coin)
     if _input_pressed then
-      if frame_number < (last_coin_input_frame + _input_buffer_length) then
+      if gamestate.frame_number < (last_coin_input_frame + _input_buffer_length) then
         last_coin_input_frame = -1
 
         -- double tap
@@ -2000,11 +2000,11 @@ function update_recording(_input)
         end
 
       else
-        last_coin_input_frame = frame_number
+        last_coin_input_frame = gamestate.frame_number
       end
     end
 
-    if last_coin_input_frame > 0 and frame_number >= last_coin_input_frame + _input_buffer_length then
+    if last_coin_input_frame > 0 and gamestate.frame_number >= last_coin_input_frame + _input_buffer_length then
       last_coin_input_frame = -1
 
       -- single tap
@@ -2063,17 +2063,17 @@ end
 
 -- PROGRAM
 
-P1.debug_state_variables = false
-P1.debug_freeze_frames = false
-P1.debug_animation_frames = false
-P1.debug_standing_state = false
-P1.debug_wake_up = false
+gamestate.P1.debug_state_variables = false
+gamestate.P1.debug_freeze_frames = false
+gamestate.P1.debug_animation_frames = false
+gamestate.P1.debug_standing_state = false
+gamestate.P1.debug_wake_up = false
 
-P2.debug_state_variables = false
-P2.debug_freeze_frames = false
-P2.debug_animation_frames = false
-P2.debug_standing_state = false
-P2.debug_wake_up = false
+gamestate.P2.debug_state_variables = false
+gamestate.P2.debug_freeze_frames = false
+gamestate.P2.debug_animation_frames = false
+gamestate.P2.debug_standing_state = false
+gamestate.P2.debug_wake_up = false
 
 function write_player_vars(_player_obj)
 
@@ -2088,7 +2088,7 @@ function write_player_vars(_player_obj)
   end
 
   -- LIFE
-  if is_in_match and not is_menu_open then
+  if gamestate.is_in_match and not is_menu_open then
     local _life = memory.readbyte(_player_obj.base + 0x9F)
     if training_settings.life_mode == 2 then
       if _player_obj.is_idle and _player_obj.idle_time > training_settings.life_refill_delay then
@@ -2103,7 +2103,7 @@ function write_player_vars(_player_obj)
   end
 
   -- METER
-  if is_in_match and not is_menu_open and not _player_obj.is_in_timed_sa then
+  if gamestate.is_in_match and not is_menu_open and not _player_obj.is_in_timed_sa then
     -- If the SA is a timed SA, the gauge won't go back to 0 when it reaches max. We have to make special cases for it
     local _is_timed_sa = character_specific[_player_obj.char_str].timed_sa[_player_obj.selected_sa]
 
@@ -2176,7 +2176,7 @@ function write_player_vars(_player_obj)
     memory.writebyte(_player_obj.stun_timer_addr, 0);
     memory.writedword(_player_obj.stun_bar_addr, 0);
   elseif training_settings.stun_mode == 3 then
-    if is_in_match and not is_menu_open and _player_obj.is_idle then
+    if gamestate.is_in_match and not is_menu_open and _player_obj.is_idle then
       local _wanted_stun = 0
       if _player_obj.id == 1 then
         _wanted_stun = training_settings.p1_stun_reset_value
@@ -2266,26 +2266,26 @@ function before_frame()
   display_update()
 
   -- gamestate
-  local _previous_dummy_char_str = player_objects[2].char_str or ""
+  local _previous_dummy_char_str = gamestate.player_objects[2].char_str or ""
   gamestate_read()
 
   -- load recordings according to P2 character
-  if _previous_dummy_char_str ~= player_objects[2].char_str then
+  if _previous_dummy_char_str ~= gamestate.player_objects[2].char_str then
     restore_recordings()
   end
 
   -- cap training settings
-  if is_in_match then
-    training_settings.p1_meter = math.min(training_settings.p1_meter, player_objects[1].max_meter_count * player_objects[1].max_meter_gauge)
-    training_settings.p2_meter = math.min(training_settings.p2_meter, player_objects[2].max_meter_count * player_objects[2].max_meter_gauge)
-    p1_meter_gauge_item.gauge_max = player_objects[1].max_meter_gauge * player_objects[1].max_meter_count
-    p1_meter_gauge_item.subdivision_count = player_objects[1].max_meter_count
-    p2_meter_gauge_item.gauge_max = player_objects[2].max_meter_gauge * player_objects[2].max_meter_count
-    p2_meter_gauge_item.subdivision_count = player_objects[2].max_meter_count
-    training_settings.p1_stun_reset_value = math.min(training_settings.p1_stun_reset_value, player_objects[1].stun_max)
-    training_settings.p2_stun_reset_value = math.min(training_settings.p2_stun_reset_value, player_objects[2].stun_max)
-    p1_stun_reset_value_gauge_item.gauge_max = player_objects[1].stun_max
-    p2_stun_reset_value_gauge_item.gauge_max = player_objects[2].stun_max
+  if gamestate.is_in_match then
+    training_settings.p1_meter = math.min(training_settings.p1_meter, gamestate.player_objects[1].max_meter_count * gamestate.player_objects[1].max_meter_gauge)
+    training_settings.p2_meter = math.min(training_settings.p2_meter, gamestate.player_objects[2].max_meter_count * gamestate.player_objects[2].max_meter_gauge)
+    p1_meter_gauge_item.gauge_max = gamestate.player_objects[1].max_meter_gauge * gamestate.player_objects[1].max_meter_count
+    p1_meter_gauge_item.subdivision_count = gamestate.player_objects[1].max_meter_count
+    p2_meter_gauge_item.gauge_max = gamestate.player_objects[2].max_meter_gauge * gamestate.player_objects[2].max_meter_count
+    p2_meter_gauge_item.subdivision_count = gamestate.player_objects[2].max_meter_count
+    training_settings.p1_stun_reset_value = math.min(training_settings.p1_stun_reset_value, gamestate.player_objects[1].stun_max)
+    training_settings.p2_stun_reset_value = math.min(training_settings.p2_stun_reset_value, gamestate.player_objects[2].stun_max)
+    p1_stun_reset_value_gauge_item.gauge_max = gamestate.player_objects[1].stun_max
+    p2_stun_reset_value_gauge_item.gauge_max = gamestate.player_objects[2].stun_max
   end
 
   local _write_game_vars_settings =
@@ -2296,21 +2296,21 @@ function before_frame()
   }
   write_game_vars(_write_game_vars_settings)
 
-  write_player_vars(player_objects[1])
-  write_player_vars(player_objects[2])
+  write_player_vars(gamestate.player_objects[1])
+  write_player_vars(gamestate.player_objects[2])
 
   -- input
   local _input = joypad.get()
-  if is_in_match and not is_menu_open and swap_characters then
+  if gamestate.is_in_match and not is_menu_open and swap_characters then
     swap_inputs(_input)
   end
 
   if not swap_characters then
-    player = player_objects[1]
-    dummy = player_objects[2]
+    player = gamestate.player_objects[1]
+    dummy = gamestate.player_objects[2]
   else
-    player = player_objects[2]
-    dummy = player_objects[1]
+    player = gamestate.player_objects[2]
+    dummy = gamestate.player_objects[1]
   end
 
   -- frame advantage
@@ -2334,10 +2334,10 @@ function before_frame()
   -- recording
   update_recording(_input)
 
-  process_pending_input_sequence(player_objects[1], _input)
-  process_pending_input_sequence(player_objects[2], _input)
+  process_pending_input_sequence(gamestate.player_objects[1], _input)
+  process_pending_input_sequence(gamestate.player_objects[2], _input)
 
-  if is_in_match then
+  if gamestate.is_in_match then
     input_history_update(input_history[1], "P1", _input)
     input_history_update(input_history[2], "P2", _input)
   else
@@ -2360,7 +2360,7 @@ function before_frame()
       end
     end
 
-    for _i, _o in ipairs(player_objects) do
+    for _i, _o in ipairs(gamestate.player_objects) do
       log_input(_o, "Left")
       log_input(_o, "Right")
       log_input(_o, "Up")
@@ -2377,8 +2377,8 @@ function before_frame()
 
   joypad.set(_input)
 
-  update_framedata_recording(player_objects[1], projectiles)
-  update_idle_framedata_recording(player_objects[2])
+  update_framedata_recording(gamestate.player_objects[1], projectiles)
+  update_idle_framedata_recording(gamestate.player_objects[2])
   update_projectiles_recording(projectiles)
   update_wakeupdata_recording(player, dummy)
 
@@ -2404,7 +2404,7 @@ function before_frame()
 
       local _movement = nil
       local _lifetime = _obj.lifetime
-      local _projectile_meta_data = frame_data_meta[player_objects[_obj.emitter_id].char_str].projectiles[_obj.projectile_type]
+      local _projectile_meta_data = frame_data_meta[gamestate.player_objects[_obj.emitter_id].char_str].projectiles[_obj.projectile_type]
       if _projectile_meta_data ~= nil then
         _movement = _projectile_meta_data.movement
       end
@@ -2421,35 +2421,35 @@ is_menu_open = false
 
 function on_gui()
 
-  if P1.input.pressed.start then
+  if gamestate.P1.input.pressed.start then
     clear_printed_geometry()
   end
 
   draw_character_select()
 
-  if is_in_match then
+  if gamestate.is_in_match then
 
     --[[
     -- Code to test frame advantage correctness by measuring the frame count between both players jump
-    if (player_objects[1].last_jump_startup_frame ~= nil and player_objects[2].last_jump_startup_frame ~= nil) then
-      gui.text(5, 5, string.format("jump difference: %d (startups: %d/%d)", player_objects[2].last_jump_startup_frame - player_objects[1].last_jump_startup_frame, player_objects[1].last_jump_startup_duration, player_objects[2].last_jump_startup_duration), text_default_color, text_default_border_color)
+    if (gamestate.player_objects[1].last_jump_startup_frame ~= nil and gamestate.player_objects[2].last_jump_startup_frame ~= nil) then
+      gui.text(5, 5, string.format("jump difference: %d (startups: %d/%d)", gamestate.player_objects[2].last_jump_startup_frame - gamestate.player_objects[1].last_jump_startup_frame, gamestate.player_objects[1].last_jump_startup_duration, gamestate.player_objects[2].last_jump_startup_duration), text_default_color, text_default_border_color)
     end
     ]]
 
     display_draw_printed_geometry()
 
     if training_settings.display_gauges then
-      display_draw_life(player_objects[1])
-      display_draw_life(player_objects[2])
+      display_draw_life(gamestate.player_objects[1])
+      display_draw_life(gamestate.player_objects[2])
 
-      display_draw_meter(player_objects[1])
-      display_draw_meter(player_objects[2])
+      display_draw_meter(gamestate.player_objects[1])
+      display_draw_meter(gamestate.player_objects[2])
 
-      display_draw_stun_gauge(player_objects[1])
-      display_draw_stun_gauge(player_objects[2])
+      display_draw_stun_gauge(gamestate.player_objects[1])
+      display_draw_stun_gauge(gamestate.player_objects[2])
 
-      display_draw_bonuses(player_objects[1])
-      display_draw_bonuses(player_objects[2])
+      display_draw_bonuses(gamestate.player_objects[1])
+      display_draw_bonuses(gamestate.player_objects[2])
     end
 
     -- hitboxes
@@ -2459,7 +2459,7 @@ function on_gui()
 
     -- input history
     if training_settings.display_p1_input_history_dynamic and training_settings.display_p1_input_history then
-      if player_objects[1].pos_x < 320 then
+      if gamestate.player_objects[1].pos_x < 320 then
         input_history_draw(input_history[1], screen_width - 4, 49, true)
       else
         input_history_draw(input_history[1], 4, 49, false)
@@ -2497,7 +2497,7 @@ function on_gui()
     if _debug_frame_data then
       local _debug_move = _debug_frame_data[debug_settings.debug_move]
       if _debug_move and _debug_move.frames then
-        local _move_frame = frame_number % #_debug_move.frames
+        local _move_frame = gamestate.frame_number % #_debug_move.frames
 
         local _debug_pos_x = player.pos_x
         local _debug_pos_y = player.pos_y
@@ -2515,9 +2515,9 @@ function on_gui()
     end
   end
 
-  if is_in_match and special_training_mode[training_settings.special_training_current_mode] == "parry" then
+  if gamestate.is_in_match and special_training_mode[training_settings.special_training_current_mode] == "parry" then
 
-    local _player = P1
+    local _player = gamestate.P1
     local _x = 235 --96
     local _y = 40
     local _flip_gauge = false
@@ -2620,9 +2620,9 @@ function on_gui()
   end
 
   -- Charge Meter Drawing
-  if is_in_match and special_training_mode[training_settings.special_training_current_mode] == "charge" then
+  if gamestate.is_in_match and special_training_mode[training_settings.special_training_current_mode] == "charge" then
 
-    local _player = P1
+    local _player = gamestate.P1
     local _x = 276 --96
     local _y = 40
     local _flip_gauge = false
@@ -2719,7 +2719,7 @@ function on_gui()
     end
   end
 
-  if is_in_match and current_recording_state ~= 1 then
+  if gamestate.is_in_match and current_recording_state ~= 1 then
     local _y = 5
     local _current_recording_size = 0
     if (recording_slots[training_settings.current_recording_slot].inputs) then
@@ -2750,10 +2750,10 @@ function on_gui()
     log_draw()
   end
 
-  if is_in_match then
-    local _should_toggle = P1.input.pressed.start
+  if gamestate.is_in_match then
+    local _should_toggle = gamestate.P1.input.pressed.start
     if log_enabled then
-      _should_toggle = P1.input.released.start
+      _should_toggle = gamestate.P1.input.released.start
     end
     _should_toggle = not log_start_locked and _should_toggle
 
@@ -2781,13 +2781,13 @@ function on_gui()
 
     local _input =
     {
-      down = check_input_down_autofire(player_objects[1], "down", _vertical_autofire_rate),
-      up = check_input_down_autofire(player_objects[1], "up", _vertical_autofire_rate),
-      left = check_input_down_autofire(player_objects[1], "left", _horizontal_autofire_rate),
-      right = check_input_down_autofire(player_objects[1], "right", _horizontal_autofire_rate),
-      validate = P1.input.pressed.LP,
-      reset = P1.input.pressed.MP,
-      cancel = P1.input.pressed.LK,
+      down = check_input_down_autofire(gamestate.player_objects[1], "down", _vertical_autofire_rate),
+      up = check_input_down_autofire(gamestate.player_objects[1], "up", _vertical_autofire_rate),
+      left = check_input_down_autofire(gamestate.player_objects[1], "left", _horizontal_autofire_rate),
+      right = check_input_down_autofire(gamestate.player_objects[1], "right", _horizontal_autofire_rate),
+      validate = gamestate.P1.input.pressed.LP,
+      reset = gamestate.P1.input.pressed.MP,
+      cancel = gamestate.P1.input.pressed.LK,
     }
 
     menu_stack_update(_input)

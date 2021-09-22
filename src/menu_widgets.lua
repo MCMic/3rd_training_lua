@@ -172,7 +172,7 @@ function textfield_menu_item(_name, _object, _property_name, _default_value, _ma
 
     if self.is_in_edition then
       local _cycle = 100
-      if ((frame_number % _cycle) / _cycle) < 0.5 then
+      if ((gamestate.frame_number % _cycle) / _cycle) < 0.5 then
         gui.text(_x + (#self.name + 3 + #self.content - 1) * 4, _y + 2, "_", _c, text_default_border_color)
       end
     end
@@ -510,11 +510,11 @@ function button_menu_item(_name, _validate_function)
     if _selected then
       _c = text_selected_color
 
-      if self.last_frame_validated > frame_number then
+      if self.last_frame_validated > gamestate.frame_number then
         self.last_frame_validated = 0
       end
 
-      if (frame_number - self.last_frame_validated < 5 ) then
+      if (gamestate.frame_number - self.last_frame_validated < 5 ) then
         _c = 0xFFFF00FF
       end
     end
@@ -523,7 +523,7 @@ function button_menu_item(_name, _validate_function)
   end
 
   function _o:validate()
-    self.last_frame_validated = frame_number
+    self.last_frame_validated = gamestate.frame_number
     if self.validate_function then
       self.validate_function()
     end

@@ -1,9 +1,11 @@
--- # global variables
-frame_number = 0
-is_in_match = false
-player_objects = {}
-P1 = nil
-P2 = nil
+gamestate = {
+  -- variables
+  frame_number = 0,
+  is_in_match = false,
+  player_objects = {},
+  P1 = nil,
+  P2 = nil,
+}
 
 -- # api
 function make_input_set(_value)
@@ -53,67 +55,67 @@ end
 
 
 function reset_player_objects()
-  player_objects = {
+  gamestate.player_objects = {
     make_player_object(1, 0x02068C6C, "P1"),
     make_player_object(2, 0x02069104, "P2")
   }
 
-  P1 = player_objects[1]
-  P2 = player_objects[2]
+  gamestate.P1 = gamestate.player_objects[1]
+  gamestate.P2 = gamestate.player_objects[2]
 
-  P1.gauge_addr = 0x020695B5
-  P1.meter_addr = { 0x020286AB, 0x020695BF } -- 2nd address is the master variable
-  P1.stun_max_addr = 0x020695F7
-  P1.stun_timer_addr = P1.stun_max_addr + 0x2
-  P1.stun_bar_addr = P1.stun_max_addr + 0x6
-  P1.meter_update_flag = 0x020157C8
-  P1.score_addr = 0x020113A2
-  P1.parry_forward_validity_time_addr = 0x02026335
-  P1.parry_forward_cooldown_time_addr = 0x02025731
-  P1.parry_down_validity_time_addr = 0x02026337
-  P1.parry_down_cooldown_time_addr = 0x0202574D
-  P1.parry_air_validity_time_addr = 0x02026339
-  P1.parry_air_cooldown_time_addr = 0x02025769
-  P1.parry_antiair_validity_time_addr = 0x02026347
-  P1.parry_antiair_cooldown_time_addr = 0x0202582D
+  gamestate.P1.gauge_addr = 0x020695B5
+  gamestate.P1.meter_addr = { 0x020286AB, 0x020695BF } -- 2nd address is the master variable
+  gamestate.P1.stun_max_addr = 0x020695F7
+  gamestate.P1.stun_timer_addr = gamestate.P1.stun_max_addr + 0x2
+  gamestate.P1.stun_bar_addr = gamestate.P1.stun_max_addr + 0x6
+  gamestate.P1.meter_update_flag = 0x020157C8
+  gamestate.P1.score_addr = 0x020113A2
+  gamestate.P1.parry_forward_validity_time_addr = 0x02026335
+  gamestate.P1.parry_forward_cooldown_time_addr = 0x02025731
+  gamestate.P1.parry_down_validity_time_addr = 0x02026337
+  gamestate.P1.parry_down_cooldown_time_addr = 0x0202574D
+  gamestate.P1.parry_air_validity_time_addr = 0x02026339
+  gamestate.P1.parry_air_cooldown_time_addr = 0x02025769
+  gamestate.P1.parry_antiair_validity_time_addr = 0x02026347
+  gamestate.P1.parry_antiair_cooldown_time_addr = 0x0202582D
 
-  P1.charge_1_reset_addr = 0x02025A47 -- Alex_1(Elbow)
-  P1.charge_1_addr = 0x02025A49
-  P1.charge_2_reset_addr = 0x02025A2B -- Alex_2(Stomp), Urien_2(Knee?)
-  P1.charge_2_addr = 0x02025A2D
-  P1.charge_3_reset_addr = 0x02025A0F -- Oro_1(Shou), Remy_2(LoVKick?)
-  P1.charge_3_addr = 0x02025A11
-  P1.charge_4_reset_addr = 0x020259F3 -- Urien_3(headbutt?), Q_2(DashLeg), Remy_1(LoVPunch?)
-  P1.charge_4_addr = 0x020259F5
-  P1.charge_5_reset_addr = 0x020259D7 -- Oro_2(Yanma), Urien_1(tackle), Chun_4, Q_1(DashHead), Remy_3(Rising)
-  P1.charge_5_addr = 0x020259D9
+  gamestate.P1.charge_1_reset_addr = 0x02025A47 -- Alex_1(Elbow)
+  gamestate.P1.charge_1_addr = 0x02025A49
+  gamestate.P1.charge_2_reset_addr = 0x02025A2B -- Alex_2(Stomp), Urien_2(Knee?)
+  gamestate.P1.charge_2_addr = 0x02025A2D
+  gamestate.P1.charge_3_reset_addr = 0x02025A0F -- Oro_1(Shou), Remy_2(LoVKick?)
+  gamestate.P1.charge_3_addr = 0x02025A11
+  gamestate.P1.charge_4_reset_addr = 0x020259F3 -- Urien_3(headbutt?), Q_2(DashLeg), Remy_1(LoVPunch?)
+  gamestate.P1.charge_4_addr = 0x020259F5
+  gamestate.P1.charge_5_reset_addr = 0x020259D7 -- Oro_2(Yanma), Urien_1(tackle), Chun_4, Q_1(DashHead), Remy_3(Rising)
+  gamestate.P1.charge_5_addr = 0x020259D9
 
-  P2.gauge_addr = 0x020695E1
-  P2.meter_addr = { 0x020286DF, 0x020695EB} -- 2nd address is the master variable
-  P2.stun_max_addr = 0x0206960B
-  P2.stun_timer_addr = P2.stun_max_addr + 0x2
-  P2.stun_bar_addr = P2.stun_max_addr + 0x6
-  P2.meter_update_flag = 0x020157C9
-  P2.score_addr = 0x020113AE
-  P2.parry_forward_validity_time_addr = P1.parry_forward_validity_time_addr + 0x406
-  P2.parry_forward_cooldown_time_addr = P1.parry_forward_cooldown_time_addr + 0x620
-  P2.parry_down_validity_time_addr = P1.parry_down_validity_time_addr + 0x406
-  P2.parry_down_cooldown_time_addr = P1.parry_down_cooldown_time_addr + 0x620
-  P2.parry_air_validity_time_addr = P1.parry_air_validity_time_addr + 0x406
-  P2.parry_air_cooldown_time_addr = P1.parry_air_cooldown_time_addr + 0x620
-  P2.parry_antiair_validity_time_addr = P1.parry_antiair_validity_time_addr + 0x406
-  P2.parry_antiair_cooldown_time_addr = P1.parry_antiair_cooldown_time_addr + 0x620
+  gamestate.P2.gauge_addr = 0x020695E1
+  gamestate.P2.meter_addr = { 0x020286DF, 0x020695EB} -- 2nd address is the master variable
+  gamestate.P2.stun_max_addr = 0x0206960B
+  gamestate.P2.stun_timer_addr = gamestate.P2.stun_max_addr + 0x2
+  gamestate.P2.stun_bar_addr = gamestate.P2.stun_max_addr + 0x6
+  gamestate.P2.meter_update_flag = 0x020157C9
+  gamestate.P2.score_addr = 0x020113AE
+  gamestate.P2.parry_forward_validity_time_addr = gamestate.P1.parry_forward_validity_time_addr + 0x406
+  gamestate.P2.parry_forward_cooldown_time_addr = gamestate.P1.parry_forward_cooldown_time_addr + 0x620
+  gamestate.P2.parry_down_validity_time_addr = gamestate.P1.parry_down_validity_time_addr + 0x406
+  gamestate.P2.parry_down_cooldown_time_addr = gamestate.P1.parry_down_cooldown_time_addr + 0x620
+  gamestate.P2.parry_air_validity_time_addr = gamestate.P1.parry_air_validity_time_addr + 0x406
+  gamestate.P2.parry_air_cooldown_time_addr = gamestate.P1.parry_air_cooldown_time_addr + 0x620
+  gamestate.P2.parry_antiair_validity_time_addr = gamestate.P1.parry_antiair_validity_time_addr + 0x406
+  gamestate.P2.parry_antiair_cooldown_time_addr = gamestate.P1.parry_antiair_cooldown_time_addr + 0x620
 
-  P2.charge_1_reset_addr = 0x02025FF7
-  P2.charge_1_addr = 0x02025FF9
-  P2.charge_2_reset_addr = 0x0202602F
-  P2.charge_2_addr = 0x02026031
-  P2.charge_3_reset_addr = 0x02026013
-  P2.charge_3_addr = 0x02026013
-  P2.charge_4_reset_addr = 0x0202604B
-  P2.charge_4_addr = 0x0202604D
-  P2.charge_5_reset_addr = 0x02026067
-  P2.charge_5_addr = 0x02026069
+  gamestate.P2.charge_1_reset_addr = 0x02025FF7
+  gamestate.P2.charge_1_addr = 0x02025FF9
+  gamestate.P2.charge_2_reset_addr = 0x0202602F
+  gamestate.P2.charge_2_addr = 0x02026031
+  gamestate.P2.charge_3_reset_addr = 0x02026013
+  gamestate.P2.charge_3_addr = 0x02026013
+  gamestate.P2.charge_4_reset_addr = 0x0202604B
+  gamestate.P2.charge_4_addr = 0x0202604D
+  gamestate.P2.charge_5_reset_addr = 0x02026067
+  gamestate.P2.charge_5_addr = 0x02026069
 end
 
 
@@ -123,15 +125,15 @@ function gamestate_read()
   rom.functions.read_game_vars()
 
   -- players
-  read_player_vars(player_objects[1])
-  read_player_vars(player_objects[2])
+  read_player_vars(gamestate.player_objects[1])
+  read_player_vars(gamestate.player_objects[2])
 
   -- projectiles
   read_projectiles()
 
-  if is_in_match then
-    update_flip_input(player_objects[1], player_objects[2])
-    update_flip_input(player_objects[2], player_objects[1])
+  if gamestate.is_in_match then
+    update_flip_input(gamestate.player_objects[1], gamestate.player_objects[2])
+    update_flip_input(gamestate.player_objects[2], gamestate.player_objects[1])
   end
 
   function update_player_relationships(_self, _other)
@@ -144,8 +146,8 @@ function gamestate_read()
       _self.remaining_wakeup_time = math.max(_self.remaining_wakeup_time - 1, 0)
     end
   end
-  update_player_relationships(player_objects[1], player_objects[2])
-  update_player_relationships(player_objects[2], player_objects[1])
+  update_player_relationships(gamestate.player_objects[1], gamestate.player_objects[2])
+  update_player_relationships(gamestate.player_objects[2], gamestate.player_objects[1])
 end
 
 function read_input(_player_obj)
@@ -352,7 +354,7 @@ function read_player_vars(_player_obj)
     _player_obj.throw_countdown = math.max(_player_obj.throw_countdown - 1, 0)
   end
 
-  if _player_obj.debug_freeze_frames and _player_obj.remaining_freeze_frames > 0 then print(string.format("%d - %d remaining freeze frames", frame_number, _player_obj.remaining_freeze_frames)) end
+  if _player_obj.debug_freeze_frames and _player_obj.remaining_freeze_frames > 0 then print(string.format("%d - %d remaining freeze frames", gamestate.frame_number, _player_obj.remaining_freeze_frames)) end
 
   update_object_velocity(_player_obj)
 
@@ -363,13 +365,13 @@ function read_player_vars(_player_obj)
   _player_obj.is_attacking_ext_byte = memory.readbyte(_player_obj.base + 0x429)
   _player_obj.is_attacking_ext = _player_obj.is_attacking_ext_byte > 0
   _player_obj.has_just_attacked =  _player_obj.is_attacking and not _previous_is_attacking
-  if _debug_state_variables and _player_obj.has_just_attacked then print(string.format("%d - %s attacked", frame_number, _player_obj.prefix)) end
+  if _debug_state_variables and _player_obj.has_just_attacked then print(string.format("%d - %s attacked", gamestate.frame_number, _player_obj.prefix)) end
 
   -- ACTION
   local _previous_action_count = _player_obj.action_count or 0
   _player_obj.action_count = memory.readbyte(_player_obj.base + 0x459)
   _player_obj.has_just_acted = _player_obj.action_count > _previous_action_count
-  if _debug_state_variables and _player_obj.has_just_acted then print(string.format("%d - %s acted (%d > %d)", frame_number, _player_obj.prefix, _previous_action_count, _player_obj.action_count)) end
+  if _debug_state_variables and _player_obj.has_just_acted then print(string.format("%d - %s acted (%d > %d)", gamestate.frame_number, _player_obj.prefix, _previous_action_count, _player_obj.action_count)) end
 
   -- ANIMATION
   local _self_cancel = false
@@ -379,7 +381,7 @@ function read_player_vars(_player_obj)
   if not _player_obj.has_animation_just_changed then
     if (frame_data[_player_obj.char_str] and frame_data[_player_obj.char_str][_player_obj.animation]) then
       local _all_hits_done = true
-      local _frame = frame_number - _player_obj.current_animation_start_frame - _player_obj.current_animation_freeze_frames
+      local _frame = gamestate.frame_number - _player_obj.current_animation_start_frame - _player_obj.current_animation_freeze_frames
       for __, _hit_frame in ipairs(frame_data[_player_obj.char_str][_player_obj.animation].hit_frames) do
         local _last_hit_frame = 0
         if type(_hit_frame) == "number" then
@@ -402,10 +404,10 @@ function read_player_vars(_player_obj)
   end
 
   if _player_obj.has_animation_just_changed then
-    _player_obj.current_animation_start_frame = frame_number
+    _player_obj.current_animation_start_frame = gamestate.frame_number
     _player_obj.current_animation_freeze_frames = 0
   end
-  if _debug_state_variables and _player_obj.has_animation_just_changed then print(string.format("%d - %s animation changed (%s -> %s)", frame_number, _player_obj.prefix, _previous_animation, _player_obj.animation)) end
+  if _debug_state_variables and _player_obj.has_animation_just_changed then print(string.format("%d - %s animation changed (%s -> %s)", gamestate.frame_number, _player_obj.prefix, _previous_animation, _player_obj.animation)) end
 
   -- special case for animations that introduce animations that hit at frame 0 (Alex's VChargeK for instance)
   -- Note: It's unlikely that intro animation will ever have freeze frames, so I don't think we need to handle that
@@ -425,7 +427,7 @@ function read_player_vars(_player_obj)
     _player_obj.relevant_animation_freeze_frames = 0
   end
   if _player_obj.has_relevant_animation_just_changed then
-    if _debug_state_variables then print(string.format("%d - %s relevant animation changed (%s -> %s)", frame_number, _player_obj.prefix, _previous_relevant_animation, _player_obj.relevant_animation)) end
+    if _debug_state_variables then print(string.format("%d - %s relevant animation changed (%s -> %s)", gamestate.frame_number, _player_obj.prefix, _previous_relevant_animation, _player_obj.relevant_animation)) end
     log(_player_obj.prefix, "animation", string.format("rel anim %s->%s", _previous_relevant_animation, _player_obj.relevant_animation))
   end
 
@@ -443,8 +445,8 @@ function read_player_vars(_player_obj)
     _complex_id = _complex_id..string.format("%08X",memory.readdword(_player_obj.base + 0x214 + _i * 0x04))
   end
   _player_obj.animation_frame_hash = string_hash(_complex_id)
-  _player_obj.animation_frame = frame_number - _player_obj.current_animation_start_frame - _player_obj.current_animation_freeze_frames
-  _player_obj.relevant_animation_frame = frame_number - _player_obj.relevant_animation_start_frame - _player_obj.relevant_animation_freeze_frames
+  _player_obj.animation_frame = gamestate.frame_number - _player_obj.current_animation_start_frame - _player_obj.current_animation_freeze_frames
+  _player_obj.relevant_animation_frame = gamestate.frame_number - _player_obj.relevant_animation_start_frame - _player_obj.relevant_animation_freeze_frames
 
   _player_obj.relevant_animation_frame_data = nil
   if frame_data[_player_obj.char_str] then
@@ -501,11 +503,11 @@ function read_player_vars(_player_obj)
       if _resync_target >= 0 then
         log(_player_obj.prefix, "animation", string.format("resynced %s (%d->%d)(%d.%d->%d.%d)", _player_obj.relevant_animation, _player_obj.relevant_animation_frame, (_resync_target - 1), _player_obj.animation_frame_id, _player_obj.animation_frame_hash, _player_obj.relevant_animation_frame_data.frames[_resync_target].frame_id, _player_obj.relevant_animation_frame_data.frames[_resync_target].hash or -1))
         if _player_obj.debug_animation_frames then
-          print(string.format("%d: resynced anim %s from frame %d to %d (%d -> %d)", frame_number, _player_obj.relevant_animation, _player_obj.relevant_animation_frame_data.frames[_player_obj.relevant_animation_frame + 1].frame_id, _frame.frame_id, _player_obj.relevant_animation_frame, (_resync_target - 1)))
+          print(string.format("%d: resynced anim %s from frame %d to %d (%d -> %d)", gamestate.frame_number, _player_obj.relevant_animation, _player_obj.relevant_animation_frame_data.frames[_player_obj.relevant_animation_frame + 1].frame_id, _frame.frame_id, _player_obj.relevant_animation_frame, (_resync_target - 1)))
         end
 
         _player_obj.relevant_animation_frame = (_resync_target - 1)
-        _player_obj.relevant_animation_start_frame = frame_number - (_resync_target - 1 + _player_obj.relevant_animation_freeze_frames)
+        _player_obj.relevant_animation_start_frame = gamestate.frame_number - (_resync_target - 1 + _player_obj.relevant_animation_freeze_frames)
       end
     end
 
@@ -537,7 +539,7 @@ function read_player_vars(_player_obj)
     end
 
     if _player_obj.debug_animation_frames then
-      print(string.format("%d - %d, %d, %d, %d", frame_number, _player_obj.relevant_animation_frame, _player_obj.remaining_freeze_frames, _player_obj.animation_frame_id, _player_obj.highest_hit_id))
+      print(string.format("%d - %d, %d, %d, %d", gamestate.frame_number, _player_obj.relevant_animation_frame, _player_obj.remaining_freeze_frames, _player_obj.animation_frame_id, _player_obj.highest_hit_id))
     end
   end
   if _player_obj.has_just_acted then
@@ -562,7 +564,7 @@ function read_player_vars(_player_obj)
 
   _player_obj.last_movement_type_change_frame = _player_obj.last_movement_type_change_frame or 0
   if _player_obj.movement_type ~= _previous_movement_type then
-    _player_obj.last_movement_type_change_frame = frame_number
+    _player_obj.last_movement_type_change_frame = gamestate.frame_number
   end
 
   -- is blocking/has just blocked/has just been hit/has_just_parried
@@ -572,7 +574,7 @@ function read_player_vars(_player_obj)
     _player_obj.has_just_blocked = true
     log(_player_obj.prefix, "fight", "block")
     if _debug_state_variables then
-      print(string.format("%d - %s blocked", frame_number, _player_obj.prefix))
+      print(string.format("%d - %s blocked", gamestate.frame_number, _player_obj.prefix))
     end
   end
   _player_obj.is_blocking = _player_obj.blocking_id > 0 and _player_obj.blocking_id < 5 or _player_obj.has_just_blocked
@@ -587,7 +589,7 @@ function read_player_vars(_player_obj)
   if _player_obj.received_connection and _player_obj.received_connection_marker == 0xFFF1 and _total_received_hit_count_diff == 0 then
     _player_obj.has_just_parried = true
     log(_player_obj.prefix, "fight", "parry")
-    if _debug_state_variables then print(string.format("%d - %s parried", frame_number, _player_obj.prefix)) end
+    if _debug_state_variables then print(string.format("%d - %s parried", gamestate.frame_number, _player_obj.prefix)) end
   end
 
   -- HITS
@@ -597,7 +599,7 @@ function read_player_vars(_player_obj)
   if _player_obj.has_just_hit then
     log(_player_obj.prefix, "fight", "has hit")
     if _debug_state_variables then
-      print(string.format("%d - %s hit (%d > %d)", frame_number, _player_obj.prefix, _previous_hit_count, _player_obj.hit_count))
+      print(string.format("%d - %s hit (%d > %d)", gamestate.frame_number, _player_obj.prefix, _previous_hit_count, _player_obj.hit_count))
     end
   end
 
@@ -607,7 +609,7 @@ function read_player_vars(_player_obj)
   _player_obj.connected_action_count = memory.readbyte(_player_obj.base + 0x17B)
   local _blocked_count = _player_obj.connected_action_count - _player_obj.hit_count
   _player_obj.has_just_been_blocked = _blocked_count > _previous_blocked_count
-  if _debug_state_variables and _player_obj.has_just_been_blocked then print(string.format("%d - %s blocked (%d > %d)", frame_number, _player_obj.prefix, _previous_blocked_count, _blocked_count)) end
+  if _debug_state_variables and _player_obj.has_just_been_blocked then print(string.format("%d - %s blocked (%d > %d)", gamestate.frame_number, _player_obj.prefix, _previous_blocked_count, _blocked_count)) end
 
   -- LANDING
   local _previous_is_in_jump_startup = _player_obj.is_in_jump_startup or false
@@ -615,8 +617,8 @@ function read_player_vars(_player_obj)
   _player_obj.previous_standing_state = _player_obj.standing_state or 0
   _player_obj.standing_state = memory.readbyte(_player_obj.base + 0x297)
   _player_obj.has_just_landed = is_state_on_ground(_player_obj.standing_state, _player_obj) and not is_state_on_ground(_player_obj.previous_standing_state, _player_obj)
-  if _debug_state_variables and _player_obj.has_just_landed then print(string.format("%d - %s landed (%d > %d)", frame_number, _player_obj.prefix, _player_obj.previous_standing_state, _player_obj.standing_state)) end
-  if _player_obj.debug_standing_state and _player_obj.previous_standing_state ~= _player_obj.standing_state then print(string.format("%d - %s standing state changed (%d > %d)", frame_number, _player_obj.prefix, _player_obj.previous_standing_state, _player_obj.standing_state)) end
+  if _debug_state_variables and _player_obj.has_just_landed then print(string.format("%d - %s landed (%d > %d)", gamestate.frame_number, _player_obj.prefix, _player_obj.previous_standing_state, _player_obj.standing_state)) end
+  if _player_obj.debug_standing_state and _player_obj.previous_standing_state ~= _player_obj.standing_state then print(string.format("%d - %s standing state changed (%d > %d)", gamestate.frame_number, _player_obj.prefix, _player_obj.previous_standing_state, _player_obj.standing_state)) end
 
   -- AIR RECOVERY STATE
   local _debug_air_recovery = false
@@ -689,7 +691,7 @@ function read_player_vars(_player_obj)
   end
 
 
-  if is_in_match then
+  if gamestate.is_in_match then
 
     -- WAKE UP
     _player_obj.previous_can_fast_wakeup = _player_obj.can_fast_wakeup or 0
@@ -714,7 +716,7 @@ function read_player_vars(_player_obj)
       _player_obj.wakeup_time = 0
       _player_obj.wakeup_animation = _player_obj.animation
       if debug_wakeup then
-        print(string.format("%d - %s wakeup started", frame_number, _player_obj.prefix))
+        print(string.format("%d - %s wakeup started", gamestate.frame_number, _player_obj.prefix))
       end
     end
 
@@ -726,7 +728,7 @@ function read_player_vars(_player_obj)
       _player_obj.wakeup_time = 0
       _player_obj.wakeup_animation = _player_obj.animation
       if debug_wakeup then
-        print(string.format("%d - %s fast wakeup started", frame_number, _player_obj.prefix))
+        print(string.format("%d - %s fast wakeup started", gamestate.frame_number, _player_obj.prefix))
       end
     end
 
@@ -740,7 +742,7 @@ function read_player_vars(_player_obj)
 
     if _player_obj.is_wakingup and _previous_posture == 0x26 and _player_obj.posture ~= 0x26 then
       if debug_wakeup then
-        print(string.format("%d - %s wake up: %d, %s, %d", frame_number, _player_obj.prefix, to_bit(_player_obj.is_fast_wakingup), _player_obj.wakeup_animation, _player_obj.wakeup_time))
+        print(string.format("%d - %s wake up: %d, %s, %d", gamestate.frame_number, _player_obj.prefix, to_bit(_player_obj.is_fast_wakingup), _player_obj.wakeup_animation, _player_obj.wakeup_time))
       end
       _player_obj.is_wakingup = false
       _player_obj.is_fast_wakingup = false
@@ -764,7 +766,7 @@ function read_player_vars(_player_obj)
 
   if not _previous_is_in_jump_startup and _player_obj.is_in_jump_startup then
     _player_obj.last_jump_startup_duration = 0
-    _player_obj.last_jump_startup_frame = frame_number
+    _player_obj.last_jump_startup_frame = gamestate.frame_number
   end
 
   if _player_obj.is_in_jump_startup then
@@ -793,7 +795,7 @@ function read_player_vars(_player_obj)
     -- read data
     _parry_object.last_hit_or_block_frame =  _parry_object.last_hit_or_block_frame or 0
     if _player_obj.has_just_blocked or _player_obj.has_just_been_hit then
-      _parry_object.last_hit_or_block_frame = frame_number
+      _parry_object.last_hit_or_block_frame = gamestate.frame_number
     end
     _parry_object.last_validity_start_frame = _parry_object.last_validity_start_frame or 0
     local _previous_validity_time = _parry_object.validity_time or 0
@@ -801,7 +803,7 @@ function read_player_vars(_player_obj)
     _parry_object.cooldown_time = memory.readbyte(_cooldown_addr)
     if _parry_object.cooldown_time == 0xFF then _parry_object.cooldown_time = 0 end
     if _previous_validity_time == 0 and _parry_object.validity_time ~= 0 then
-      _parry_object.last_validity_start_frame = frame_number
+      _parry_object.last_validity_start_frame = gamestate.frame_number
       _parry_object.delta = nil
       _parry_object.success = nil
       _parry_object.armed = true
@@ -812,20 +814,20 @@ function read_player_vars(_player_obj)
     if _parry_object.armed then
       if _player_obj.has_just_parried then
         -- right
-        _parry_object.delta = frame_number - _parry_object.last_validity_start_frame
+        _parry_object.delta = gamestate.frame_number - _parry_object.last_validity_start_frame
         _parry_object.success = true
         _parry_object.armed = false
         _parry_object.last_hit_or_block_frame = 0
         log(_player_obj.prefix, "parry_training_".._parry_object.name, "success")
-      elseif _parry_object.last_validity_start_frame == frame_number - 1 and (frame_number - _parry_object.last_hit_or_block_frame) < 20 then
-        local _delta = _parry_object.last_hit_or_block_frame - frame_number + 1
+      elseif _parry_object.last_validity_start_frame == gamestate.frame_number - 1 and (gamestate.frame_number - _parry_object.last_hit_or_block_frame) < 20 then
+        local _delta = _parry_object.last_hit_or_block_frame - gamestate.frame_number + 1
         if _parry_object.delta == nil or math.abs(_parry_object.delta) > math.abs(_delta) then
           _parry_object.delta = _delta
           _parry_object.success = false
         end
         log(_player_obj.prefix, "parry_training_".._parry_object.name, "late")
       elseif _player_obj.has_just_blocked or _player_obj.has_just_been_hit then
-        local _delta = frame_number - _parry_object.last_validity_start_frame
+        local _delta = gamestate.frame_number - _parry_object.last_validity_start_frame
         if _parry_object.delta == nil or math.abs(_parry_object.delta) > math.abs(_delta) then
           _parry_object.delta = _delta
           _parry_object.success = false
@@ -833,7 +835,7 @@ function read_player_vars(_player_obj)
         log(_player_obj.prefix, "parry_training_".._parry_object.name, "early")
       end
     end
-    if frame_number - _parry_object.last_validity_start_frame > 30 and _parry_object.armed then
+    if gamestate.frame_number - _parry_object.last_validity_start_frame > 30 and _parry_object.armed then
 
       _parry_object.armed = false
       _parry_object.last_hit_or_block_frame = 0
@@ -872,9 +874,9 @@ function read_player_vars(_player_obj)
     if _charge_object.reset_time == 0xFF then _charge_object.reset_time = 0 else _charge_object.reset_time = _charge_object.reset_time + 1 end
     if _charge_object.charge_time == 0 then
       if _charge_object.overcharge_start == 0 then
-        _charge_object.overcharge_start = frame_number
+        _charge_object.overcharge_start = gamestate.frame_number
       else
-        _charge_object.overcharge = frame_number - _charge_object.overcharge_start
+        _charge_object.overcharge = gamestate.frame_number - _charge_object.overcharge_start
       end
     end
     if _charge_object.charge_time == _charge_object.max_charge then
@@ -960,7 +962,7 @@ function read_projectiles()
 
       if _is_initialization then
         _obj.initial_flip_x = _obj.flip_x
-        _obj.emitter_animation = player_objects[_obj.emitter_id].animation
+        _obj.emitter_animation = gamestate.player_objects[_obj.emitter_id].animation
       else
         _obj.lifetime = _obj.lifetime + 1
       end
@@ -982,7 +984,7 @@ function read_projectiles()
       end
       _obj.remaining_freeze_frames = memory.readbyte(_obj.base + 0x45)
       if projectiles[_obj.id] == nil then
-        log(player_objects[_obj.emitter_id].prefix, "projectiles", string.format("projectile %s %s 1", _obj.id, _obj.projectile_type))
+        log(gamestate.player_objects[_obj.emitter_id].prefix, "projectiles", string.format("projectile %s %s 1", _obj.id, _obj.projectile_type))
       end
       projectiles[_obj.id] = _obj
     end
@@ -996,7 +998,7 @@ function read_projectiles()
   projectiles_count = 0
   for _id, _obj in pairs(projectiles) do
     if _obj.expired then
-      log(player_objects[_obj.emitter_id].prefix, "projectiles", string.format("projectile %s 0", _id))
+      log(gamestate.player_objects[_obj.emitter_id].prefix, "projectiles", string.format("projectile %s 0", _id))
       projectiles[_id] = nil
     else
       projectiles_count = projectiles_count + 1

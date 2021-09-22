@@ -83,7 +83,7 @@ function before_frame()
 
   local _input = joypad.get()
 
-  if is_in_match then
+  if gamestate.is_in_match then
     input_history_update(input_history[1], "P1", _input)
     input_history_update(input_history[2], "P2", _input)
   else
@@ -94,7 +94,7 @@ end
 
 function on_gui()
 
-  if is_in_match then
+  if gamestate.is_in_match then
 
     -- input history
     if spectator_settings.display_input_history == 1 or spectator_settings.display_input_history == 2 then
@@ -119,7 +119,7 @@ function on_gui()
 
     -- hitboxes
     if spectator_settings.display_hitboxes == 1 or spectator_settings.display_hitboxes == 2 then
-      draw_hitboxes(player_objects[1].pos_x, player_objects[1].pos_y, player_objects[1].flip_x, player_objects[1].boxes)
+      draw_hitboxes(gamestate.player_objects[1].pos_x, gamestate.player_objects[1].pos_y, gamestate.player_objects[1].flip_x, gamestate.player_objects[1].boxes)
 
       -- projectiles
       for _id, _obj in pairs(projectiles) do
@@ -130,7 +130,7 @@ function on_gui()
     end
 
     if spectator_settings.display_hitboxes == 1 or spectator_settings.display_hitboxes == 3 then
-      draw_hitboxes(player_objects[2].pos_x, player_objects[2].pos_y, player_objects[2].flip_x, player_objects[2].boxes)
+      draw_hitboxes(gamestate.player_objects[2].pos_x, gamestate.player_objects[2].pos_y, gamestate.player_objects[2].flip_x, gamestate.player_objects[2].boxes)
 
       -- projectiles
       for _id, _obj in pairs(projectiles) do
@@ -142,17 +142,17 @@ function on_gui()
 
     -- gauges
     if spectator_settings.display_gauges == 1 or spectator_settings.display_gauges == 2 then
-      display_draw_life(player_objects[1])
-      display_draw_meter(player_objects[1])
-      display_draw_stun_gauge(player_objects[1])
-      display_draw_bonuses(player_objects[1])
+      display_draw_life(gamestate.player_objects[1])
+      display_draw_meter(gamestate.player_objects[1])
+      display_draw_stun_gauge(gamestate.player_objects[1])
+      display_draw_bonuses(gamestate.player_objects[1])
     end
 
     if spectator_settings.display_gauges == 1 or spectator_settings.display_gauges == 3 then
-      display_draw_life(player_objects[2])
-      display_draw_meter(player_objects[2])
-      display_draw_stun_gauge(player_objects[2])
-      display_draw_bonuses(player_objects[2])
+      display_draw_life(gamestate.player_objects[2])
+      display_draw_meter(gamestate.player_objects[2])
+      display_draw_stun_gauge(gamestate.player_objects[2])
+      display_draw_bonuses(gamestate.player_objects[2])
     end
 
   end

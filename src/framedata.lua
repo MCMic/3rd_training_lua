@@ -200,13 +200,13 @@ function record_framedata(_player_obj, _projectiles)
 
   if (current_recording_animation) then
 
-    local _frame = frame_number - _player_obj.current_animation_freeze_frames - _player_obj.current_animation_start_frame
+    local _frame = gamestate.frame_number - _player_obj.current_animation_freeze_frames - _player_obj.current_animation_start_frame
     if _player_obj.has_just_acted then
       table.insert(current_recording_animation.hit_frames, _frame)
     end
 
     if _player_obj.remaining_freeze_frames == 0 then
-      --print(string.format("recording frame %d (%d - %d - %d)", _frame, frame_number, _player_obj.current_animation_freeze_frames, _player_obj.current_animation_start_frame))
+      --print(string.format("recording frame %d (%d - %d - %d)", _frame, gamestate.frame_number, _player_obj.current_animation_freeze_frames, _player_obj.current_animation_start_frame))
 
       local _sign = 1
       if _player_obj.flip_input then _sign = -1 end
@@ -269,7 +269,7 @@ function record_projectiles(_projectiles)
   for _id, _obj in pairs(_projectiles) do
     local _recording = projectiles_recording[_id] or { type = "", start_lifetime = 0, boxes = {}, recorded = false }
     _recording.type = _obj.projectile_start_type
-    _recording.char_str = player_objects[_obj.emitter_id].char_str
+    _recording.char_str = gamestate.player_objects[_obj.emitter_id].char_str
 
     if not _recording.recorded then
       if #_recording.boxes == 0 and #_obj.boxes > 0 then
@@ -395,7 +395,7 @@ function record_idle_framedata(_player_obj)
 end
 
 function update_framedata_recording(_player_obj, _projectiles)
-  if debug_settings.record_framedata and is_in_match and not is_menu_open then
+  if debug_settings.record_framedata and gamestate.is_in_match and not is_menu_open then
     record_framedata(_player_obj, _projectiles)
   else
     reset_current_recording_animation()
@@ -403,7 +403,7 @@ function update_framedata_recording(_player_obj, _projectiles)
 end
 
 function update_projectiles_recording(_projectiles)
-  if debug_settings.record_framedata and is_in_match and not is_menu_open then
+  if debug_settings.record_framedata and gamestate.is_in_match and not is_menu_open then
     record_projectiles(_projectiles)
   else
     reset_current_projectiles_recording()
@@ -411,7 +411,7 @@ function update_projectiles_recording(_projectiles)
 end
 
 function update_idle_framedata_recording(_player_obj)
-  if debug_settings.record_idle_framedata and is_in_match and not is_menu_open then
+  if debug_settings.record_idle_framedata and gamestate.is_in_match and not is_menu_open then
     record_idle_framedata(_player_obj)
   else
     reset_current_recording_idle_animation()
@@ -488,7 +488,7 @@ function insert_wake_up(_char_str, _wakeup_animation, _last_act_animation, _dura
 end
 
 function update_wakeupdata_recording(_player_obj, _dummy_obj)
-  if not is_in_match then
+  if not gamestate.is_in_match then
     return
   end
   -- moves to record to produce a complete set of wake ups:

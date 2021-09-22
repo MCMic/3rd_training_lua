@@ -24,7 +24,7 @@ function frame_advantage_update(_attacker, _defender)
     move_advantage = {
       armed = true,
       player_id = _attacker.id,
-      start_frame = frame_number,
+      start_frame = gamestate.frame_number,
       hitbox_start_frame = nil,
       hit_frame = nil,
       end_frame = nil,
@@ -42,7 +42,7 @@ function frame_advantage_update(_attacker, _defender)
     if move_advantage.hitbox_start_frame == nil then
       for _, _box in ipairs(_attacker.boxes) do
         if _box.type == "attack" or _box.type == "throw" then
-          move_advantage.hitbox_start_frame = frame_number
+          move_advantage.hitbox_start_frame = gamestate.frame_number
           move_advantage.end_frame = nil
 
           log(_attacker.prefix, "frame_advantage", string.format("hitbox"))
@@ -51,7 +51,7 @@ function frame_advantage_update(_attacker, _defender)
       end
       for _, _projectile in pairs(projectiles) do
         if _projectile.emitter_id == _attacker.id and _projectile.has_activated then
-          move_advantage.hitbox_start_frame = frame_number + 1
+          move_advantage.hitbox_start_frame = gamestate.frame_number + 1
           move_advantage.end_frame = nil
           log(_attacker.prefix, "frame_advantage", string.format("proj hitbox(+1)"))
           break
@@ -60,7 +60,7 @@ function frame_advantage_update(_attacker, _defender)
     end
 
     if (_attacker.has_just_hit or _attacker.has_just_been_blocked or _defender.has_just_been_hit or _defender.has_just_blocked) then
-      move_advantage.hit_frame = frame_number
+      move_advantage.hit_frame = gamestate.frame_number
       move_advantage.opponent_end_frame = nil
       if move_advantage.hitbox_start_frame == nil then
         move_advantage.hitbox_start_frame = move_advantage.hit_frame
@@ -73,17 +73,17 @@ function frame_advantage_update(_attacker, _defender)
     end
 
     if move_advantage.hit_frame ~= nil then
-      if move_advantage.hitbox_start_frame ~= nil and frame_number > move_advantage.hit_frame then
+      if move_advantage.hitbox_start_frame ~= nil and gamestate.frame_number > move_advantage.hit_frame then
         if move_advantage.end_frame == nil and has_ended_attack(_attacker) then
-          move_advantage.end_frame = frame_number
+          move_advantage.end_frame = gamestate.frame_number
 
           log(_attacker.prefix, "frame_advantage", string.format("end bf:%d js:%d", _attacker.busy_flag, to_bit(_attacker.is_in_jump_startup)))
         end
 
-        if move_advantage.opponent_end_frame == nil and frame_number > move_advantage.hit_frame and has_ended_recovery(_defender) then
+        if move_advantage.opponent_end_frame == nil and gamestate.frame_number > move_advantage.hit_frame and has_ended_recovery(_defender) then
           log(_defender.prefix, "frame_advantage", string.format("end"))
-          move_advantage.opponent_end_frame = frame_number
-        end 
+          move_advantage.opponent_end_frame = gamestate.frame_number
+        end
       end
     end
 
@@ -131,7 +131,7 @@ function frame_advantage_display()
   if move_advantage.hit_frame ~= nil then
     local _hit_frame = move_advantage.hit_frame - move_advantage.start_frame + 1
     gui.text(_x2, _y + 10, string.format("hit frame: "))
-    gui.text(_x2 + _text_width2, _y + 10, string.format("%d", _hit_frame))  
+    gui.text(_x2 + _text_width2, _y + 10, string.format("%d", _hit_frame))
   end
 
   if move_advantage.hit_frame ~= nil and move_advantage.end_frame ~= nil and move_advantage.opponent_end_frame ~= nil then
@@ -153,7 +153,7 @@ function frame_advantage_display()
 end
 
 function frame_advantage_reset()
-  move_advantage = 
+  move_advantage =
   {
     armed = false
   }

@@ -260,7 +260,7 @@ end
 
 function display_draw_hitboxes()
   -- players
-  for _id, _obj in pairs(player_objects) do
+  for _id, _obj in pairs(gamestate.player_objects) do
     draw_hitboxes(_obj.pos_x, _obj.pos_y, _obj.flip_x, _obj.boxes)
   end
   -- projectiles
@@ -371,7 +371,7 @@ function display_draw_bonuses(_player_object)
 
     gui.text(_x, _y, _t, 0xD6E3EFFF, 0x000029FF)
   end
-  
+
 end
 
 -- # tools

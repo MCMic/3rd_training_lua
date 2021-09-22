@@ -9,8 +9,8 @@ character_select_coroutine = nil
 character_select_sequence_state = 0
 
 function co_wait_x_frames(_frame_count)
-  local _start_frame = frame_number
-  while frame_number < _start_frame + _frame_count do
+  local _start_frame = gamestate.frame_number
+  while gamestate.frame_number < _start_frame + _frame_count do
     coroutine.yield()
   end
 end
@@ -44,7 +44,7 @@ function co_select_gill(_input)
   memory.writebyte(adresses.players[_player_id].character_select_row, 1)
 
   make_input_empty(_input)
-  _input[player_objects[_player_id].prefix.." Weak Punch"] = true
+  _input[gamestate.player_objects[_player_id].prefix.." Weak Punch"] = true
 end
 
 function select_shingouki()
@@ -71,7 +71,7 @@ function co_select_shingouki(_input)
   memory.writebyte(adresses.players[_player_id].character_select_row, 6)
 
   make_input_empty(_input)
-  _input[player_objects[_player_id].prefix.." Weak Punch"] = true
+  _input[gamestate.player_objects[_player_id].prefix.." Weak Punch"] = true
 
   co_wait_x_frames(20)
 
@@ -106,7 +106,7 @@ function update_character_select(_input, _do_fast_forward)
 
   --print(string.format("%d, %d, %d", character_select_sequence_state, _p1_character_select_state, _p2_character_select_state))
 
-  if _p1_character_select_state > 4 and not is_in_match then
+  if _p1_character_select_state > 4 and not gamestate.is_in_match then
     if character_select_sequence_state == 2 then
       character_select_sequence_state = 3
     end
@@ -127,7 +127,7 @@ function update_character_select(_input, _do_fast_forward)
   if has_match_just_started then
     emu.speedmode("normal")
     character_select_sequence_state = 0
-  elseif not is_in_match then
+  elseif not gamestate.is_in_match then
     if _do_fast_forward and _p1_character_select_state > 4 and _p2_character_select_state > 4 then
       emu.speedmode("turbo")
     elseif character_select_sequence_state == 0 and (_p1_character_select_state < 5 or _p2_character_select_state < 5) then

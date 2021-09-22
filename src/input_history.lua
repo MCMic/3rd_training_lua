@@ -25,7 +25,7 @@ function make_input_history_entry(_prefix, _input)
   end
 
   return {
-    frame = frame_number,
+    frame = gamestate.frame_number,
     direction = _direction,
     buttons = {
       _input[_prefix.." Weak Punch"],
@@ -56,7 +56,7 @@ function input_history_update(_history, _prefix, _input)
     table.insert(_history, _entry)
   else
     local _last_entry = _history[#_history]
-    if _last_entry.frame ~= frame_number and not is_input_history_entry_equal(_entry, _last_entry) then
+    if _last_entry.frame ~= gamestate.frame_number and not is_input_history_entry_equal(_entry, _last_entry) then
       table.insert(_history, _entry)
     end
   end
@@ -81,7 +81,7 @@ function input_history_draw(_history, _x, _y, _is_right)
     local _controller_offset = 14 * _sign
     draw_controller_small(_entry, _x + _controller_offset, _current_y, _is_right)
 
-    local _next_frame = frame_number
+    local _next_frame = gamestate.frame_number
     if _i < #_history then
       _next_frame = _history[_i + 1].frame
     end
