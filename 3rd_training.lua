@@ -2,7 +2,7 @@ require("src/startup")
 
 print("-----------------------------")
 print("  3rd_training.lua - "..script_version.."")
-print("  Training mode for "..game_name.."")
+print("  Training mode for "..rom.name.."")
 print("  Last tested Fightcade version: "..fc_version.."")
 print("  project url: https://github.com/Grouflon/3rd_training_lua")
 print("-----------------------------")
@@ -287,7 +287,7 @@ stick_gesture = {
   "Shun Goku Satsu", -- Gouki hidden SA1
   "Kongou Kokuretsu Zan", -- Gouki hidden SA2
 }
-if is_4rd_strike then
+if rom.is_4rd_strike then
   table.insert(stick_gesture, "Demon Armageddon") -- Gouki SA3
 end
 
@@ -1898,7 +1898,7 @@ function go_to_next_ordered_slot()
     local _slot_index = ((last_ordered_recording_slot - 1 + _i) % recording_slot_count) + 1
     --print(_slot_index)
     if recording_slots[_slot_index].inputs ~= nil and #recording_slots[_slot_index].inputs > 0 then
-      _slot = _slot_index            
+      _slot = _slot_index
       last_ordered_recording_slot = _slot
       break
     end

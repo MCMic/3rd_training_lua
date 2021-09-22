@@ -26,7 +26,7 @@ characters =
   "twelve",
   "remy",
 }
-if is_4rd_strike then
+if rom.is_4rd_strike then
   characters[1] = "gill"
   characters[16] = "usean"
 end

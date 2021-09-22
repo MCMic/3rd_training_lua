@@ -120,7 +120,7 @@ end
 -- ## read
 function gamestate_read()
   -- game
-  read_game_vars()
+  rom.functions.read_game_vars()
 
   -- players
   read_player_vars(player_objects[1])
@@ -147,22 +147,6 @@ function gamestate_read()
   update_player_relationships(player_objects[1], player_objects[2])
   update_player_relationships(player_objects[2], player_objects[1])
 end
-
-function read_game_vars()
-  -- frame number
-  frame_number = memory.readdword(0x02007F00)
-
-  -- is in match
-  -- I believe the bytes that are expected to be 0xff means that a character has been locked, while the byte expected to be 0x02 is the current match state. 0x02 means that round has started and players can move
-  local p1_locked = memory.readbyte(0x020154C6);
-  local p2_locked = memory.readbyte(0x020154C8);
-  local match_state = memory.readbyte(0x020154A7);
-  local _previous_is_in_match = is_in_match
-  if _previous_is_in_match == nil then _previous_is_in_match = true end
-  is_in_match = ((p1_locked == 0xFF or p2_locked == 0xFF) and match_state == 0x02);
-  has_match_just_started = not _previous_is_in_match and is_in_match
-end
-
 
 function read_input(_player_obj)
 
@@ -315,7 +299,7 @@ function read_player_vars(_player_obj)
 --  0x18 -- flying backwards
 --  0x1A -- high jump
 --  0x26 -- knocked down
-  _player_obj.posture = memory.readbyte(_player_obj.base + 0x20E)  
+  _player_obj.posture = memory.readbyte(_player_obj.base + 0x20E)
 
   _player_obj.busy_flag = memory.readword(_player_obj.base + 0x3D1)
 

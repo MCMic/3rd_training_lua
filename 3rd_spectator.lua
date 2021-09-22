@@ -2,7 +2,7 @@ require("src/startup")
 
 print("-----------------------------")
 print("  3rd_spectator.lua - "..script_version.."")
-print("  Spectator script for "..game_name.."")
+print("  Spectator script for "..rom.name.."")
 print("  Last tested Fightcade version: "..fc_version.."")
 print("  project url: https://github.com/Grouflon/3rd_training_lua")
 print("-----------------------------")
@@ -74,7 +74,7 @@ function before_frame()
   gamestate_read()
 
   if developer_mode then
-    local _write_game_vars_settings = 
+    local _write_game_vars_settings =
     {
       infinite_time = true,
     }
@@ -184,7 +184,7 @@ function hotkey4()
 end
 
 
-input.registerhotkey(1, hotkey1) 
-input.registerhotkey(2, hotkey2) 
-input.registerhotkey(3, hotkey3) 
-input.registerhotkey(4, hotkey4) 
+input.registerhotkey(1, hotkey1)
+input.registerhotkey(2, hotkey2)
+input.registerhotkey(3, hotkey3)
+input.registerhotkey(4, hotkey4)
