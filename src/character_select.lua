@@ -27,8 +27,8 @@ end
 function co_select_gill(_input)
   local _player_id = 0
 
-  local _p1_character_select_state = memory.readbyte(adresses.players[1].character_select_state)
-  local _p2_character_select_state = memory.readbyte(adresses.players[2].character_select_state)
+  local _p1_character_select_state = gamestate.get_character_select_state(1)
+  local _p2_character_select_state = gamestate.get_character_select_state(2)
 
   if _p1_character_select_state > 2 and _p2_character_select_state > 2 then
     return
@@ -54,8 +54,8 @@ end
 function co_select_shingouki(_input)
   local _player_id = 0
 
-  local _p1_character_select_state = memory.readbyte(adresses.players[1].character_select_state)
-  local _p2_character_select_state = memory.readbyte(adresses.players[2].character_select_state)
+  local _p1_character_select_state = gamestate.get_character_select_state(1)
+  local _p2_character_select_state = gamestate.get_character_select_state(2)
 
   if _p1_character_select_state > 2 and _p2_character_select_state > 2 then
     return
@@ -101,8 +101,8 @@ function update_character_select(_input, _do_fast_forward)
     return
   end
 
-  local _p1_character_select_state = memory.readbyte(adresses.players[1].character_select_state)
-  local _p2_character_select_state = memory.readbyte(adresses.players[2].character_select_state)
+  local _p1_character_select_state = gamestate.get_character_select_state(1)
+  local _p2_character_select_state = gamestate.get_character_select_state(2)
 
   --print(string.format("%d, %d, %d", character_select_sequence_state, _p1_character_select_state, _p2_character_select_state))
 
@@ -141,8 +141,8 @@ function update_character_select(_input, _do_fast_forward)
 end
 
 function draw_character_select()
-  local _p1_character_select_state = memory.readbyte(adresses.players[1].character_select_state)
-  local _p2_character_select_state = memory.readbyte(adresses.players[2].character_select_state)
+  local _p1_character_select_state = gamestate.get_character_select_state(1)
+  local _p2_character_select_state = gamestate.get_character_select_state(2)
 
   if _p1_character_select_state <= 2 or _p2_character_select_state <= 2 then
     gui.text(10, 10, "Alt+1 -> Return To Character Select Screen", text_default_color, text_default_border_color)

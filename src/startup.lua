@@ -13,3 +13,11 @@ else
   print("-----------------------------")
   rom_name = "sfiii3nr1"
 end
+
+-- Run rom specific memory_adresses.lua if it exists
+rom_memory_adresses = loadfile("src/" .. rom_name .. "/memory_adresses.lua")
+if (rom_memory_adresses ~= nil) then
+  rom_memory_adresses()
+else
+  require("src/memory_adresses")
+end

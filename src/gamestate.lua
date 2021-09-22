@@ -54,10 +54,10 @@ function make_player_object(_id, _base, _prefix)
 end
 
 
-function reset_player_objects()
+function gamestate.reset_player_objects()
   gamestate.player_objects = {
-    make_player_object(1, 0x02068C6C, "P1"),
-    make_player_object(2, 0x02069104, "P2")
+    make_player_object(1, adresses.players[1].base, "P1"),
+    make_player_object(2, adresses.players[2].base, "P2")
   }
 
   gamestate.P1 = gamestate.player_objects[1]
@@ -153,7 +153,7 @@ end
 
 function gamestate.read_game_vars()
   -- frame number
-  gamestate.frame_number = memory.readdword(0x02007F00)
+  gamestate.frame_number = memory.readdword(adresses.global.frame_number)
 
   -- is in match
   -- I believe the bytes that are expected to be 0xff means that a character has been locked, while the byte expected to be 0x02 is the current match state. 0x02 means that round has started and players can move
@@ -197,6 +197,16 @@ function read_input(_player_obj)
   read_single_input(_player_obj.input, "HK", _local_input[_player_obj.prefix.." Strong Kick"])
 end
 
+-- - 0 is no player
+-- - 1 is intro anim
+-- - 2 is character select
+-- - 3 is SA intro anim
+-- - 4 is SA select
+-- - 5 is locked SA
+-- Will always stay at 5 after that and during the match
+function gamestate.get_character_select_state(id)
+  return memory.readbyte(adresses.players[id].character_select_state)
+end
 
 function read_box(_obj, _ptr, _type)
   if _obj.friends > 1 then --Yang SA3
@@ -220,7 +230,7 @@ function read_box(_obj, _ptr, _type)
   table.insert(_obj.boxes, _box)
 end
 
-function read_game_object(_obj)
+function gamestate.read_game_object(_obj)
   if memory.readdword(_obj.base + 0x2A0) == 0 then --invalid objects
     return false
   end
@@ -253,10 +263,6 @@ end
 
 
 function read_player_vars(_player_obj)
-
--- P1: 0x02068C6C
--- P2: 0x02069104
-
   if memory.readdword(_player_obj.base + 0x2A0) == 0 then --invalid objects
     return
   end
@@ -268,7 +274,7 @@ function read_player_vars(_player_obj)
   local _prev_pos_x = _player_obj.pos_x or 0
   local _prev_pos_y = _player_obj.pos_y or 0
 
-  read_game_object(_player_obj)
+  gamestate.read_game_object(_player_obj)
 
   local _previous_movement_type = _player_obj.movement_type or 0
 
@@ -973,7 +979,7 @@ function read_projectiles()
        _obj.has_activated = false
        _is_initialization = true
     end
-    if read_game_object(_obj) then
+    if gamestate.read_game_object(_obj) then
       _obj.emitter_id = memory.readbyte(_obj.base + 0x2) + 1
 
       if _is_initialization then
@@ -1116,12 +1122,11 @@ function is_state_on_ground(_state, _player_obj)
   end
 end
 
-
--- # initialize player objects
-reset_player_objects()
-
 -- Run rom specific gamestate.lua if it exists
 rom_gamestate = loadfile("src/" .. rom_name .. "/gamestate.lua")
 if (rom_gamestate ~= nil) then
   rom_gamestate()
 end
+
+-- # initialize player objects
+gamestate.reset_player_objects()

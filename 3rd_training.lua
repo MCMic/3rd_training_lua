@@ -47,7 +47,6 @@ And also having throw as an option there as well so you have one less option to 
 
 -- Includes
 require("src/tools")
-require("src/memory_adresses")
 require("src/display")
 require("src/menu_widgets")
 require("src/framedata")
@@ -2076,10 +2075,6 @@ gamestate.P2.debug_standing_state = false
 gamestate.P2.debug_wake_up = false
 
 function write_player_vars(_player_obj)
-
-  -- P1: 0x02068C6C
-  -- P2: 0x02069104
-
   local _wanted_meter = 0
   if _player_obj.id == 1 then
     _wanted_meter = training_settings.p1_meter
@@ -2197,7 +2192,7 @@ function write_player_vars(_player_obj)
 end
 
 function on_load_state()
-  reset_player_objects()
+  gamestate.reset_player_objects()
   frame_advantage_reset()
 
   gamestate.read()
