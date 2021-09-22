@@ -44,7 +44,7 @@ gamestate.read_game_vars = function ()
 end
 
 gamestate.read_game_object = function (_obj)
-  if memory.readword(_obj.base) > 0x0100 then --invalid objects
+  if memory.readword(_obj.base) <= 0x0100 then --invalid objects
     return false
   end
 
