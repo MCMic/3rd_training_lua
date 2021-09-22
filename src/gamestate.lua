@@ -120,9 +120,9 @@ end
 
 
 -- ## read
-function gamestate_read()
+function gamestate.read()
   -- game
-  rom.functions.read_game_vars()
+  gamestate.read_game_vars()
 
   -- players
   read_player_vars(gamestate.player_objects[1])
@@ -148,6 +148,22 @@ function gamestate_read()
   end
   update_player_relationships(gamestate.player_objects[1], gamestate.player_objects[2])
   update_player_relationships(gamestate.player_objects[2], gamestate.player_objects[1])
+end
+
+
+function gamestate.read_game_vars()
+  -- frame number
+  gamestate.frame_number = memory.readdword(0x02007F00)
+
+  -- is in match
+  -- I believe the bytes that are expected to be 0xff means that a character has been locked, while the byte expected to be 0x02 is the current match state. 0x02 means that round has started and players can move
+  local p1_locked = memory.readbyte(0x020154C6);
+  local p2_locked = memory.readbyte(0x020154C8);
+  local match_state = memory.readbyte(0x020154A7);
+  local _previous_is_in_match = gamestate.is_in_match
+  if _previous_is_in_match == nil then _previous_is_in_match = true end
+  gamestate.is_in_match = ((p1_locked == 0xFF or p2_locked == 0xFF) and match_state == 0x02);
+  has_match_just_started = not _previous_is_in_match and gamestate.is_in_match
 end
 
 function read_input(_player_obj)
@@ -1103,3 +1119,9 @@ end
 
 -- # initialize player objects
 reset_player_objects()
+
+-- Run rom specific gamestate.lua if it exists
+rom_gamestate = loadfile("src/" .. rom_name .. "/gamestate.lua")
+if (rom_gamestate ~= nil) then
+  rom_gamestate()
+end

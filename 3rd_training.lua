@@ -2200,7 +2200,7 @@ function on_load_state()
   reset_player_objects()
   frame_advantage_reset()
 
-  gamestate_read()
+  gamestate.read()
 
   restore_recordings()
 
@@ -2267,7 +2267,7 @@ function before_frame()
 
   -- gamestate
   local _previous_dummy_char_str = gamestate.player_objects[2].char_str or ""
-  gamestate_read()
+  gamestate.read()
 
   -- load recordings according to P2 character
   if _previous_dummy_char_str ~= gamestate.player_objects[2].char_str then

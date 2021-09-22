@@ -71,7 +71,7 @@ end
 function before_frame()
 
   display_update()
-  gamestate_read()
+  gamestate.read()
 
   if developer_mode then
     local _write_game_vars_settings =
