@@ -56,8 +56,8 @@ end
 
 function gamestate.reset_player_objects()
   gamestate.player_objects = {
-    make_player_object(1, adresses.players[1].base, "P1"),
-    make_player_object(2, adresses.players[2].base, "P2")
+    make_player_object(1, addresses.players[1].base, "P1"),
+    make_player_object(2, addresses.players[2].base, "P2")
   }
 
   gamestate.P1 = gamestate.player_objects[1]
@@ -153,7 +153,7 @@ end
 
 function gamestate.read_game_vars()
   -- frame number
-  gamestate.frame_number = memory.readdword(adresses.global.frame_number)
+  gamestate.frame_number = memory.readdword(addresses.global.frame_number)
 
   -- is in match
   -- I believe the bytes that are expected to be 0xff means that a character has been locked, while the byte expected to be 0x02 is the current match state. 0x02 means that round has started and players can move
@@ -205,7 +205,7 @@ end
 -- - 5 is locked SA
 -- Will always stay at 5 after that and during the match
 function gamestate.get_character_select_state(id)
-  return memory.readbyte(adresses.players[id].character_select_state)
+  return memory.readbyte(addresses.players[id].character_select_state)
 end
 
 function read_box(_obj, _ptr, _type)

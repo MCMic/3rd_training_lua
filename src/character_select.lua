@@ -40,8 +40,8 @@ function co_select_gill(_input)
     _player_id = 2
   end
 
-  memory.writebyte(adresses.players[_player_id].character_select_col, 3)
-  memory.writebyte(adresses.players[_player_id].character_select_row, 1)
+  memory.writebyte(addresses.players[_player_id].character_select_col, 3)
+  memory.writebyte(addresses.players[_player_id].character_select_row, 1)
 
   make_input_empty(_input)
   _input[gamestate.player_objects[_player_id].prefix.." Weak Punch"] = true
@@ -67,15 +67,15 @@ function co_select_shingouki(_input)
     _player_id = 2
   end
 
-  memory.writebyte(adresses.players[_player_id].character_select_col, 0)
-  memory.writebyte(adresses.players[_player_id].character_select_row, 6)
+  memory.writebyte(addresses.players[_player_id].character_select_col, 0)
+  memory.writebyte(addresses.players[_player_id].character_select_row, 6)
 
   make_input_empty(_input)
   _input[gamestate.player_objects[_player_id].prefix.." Weak Punch"] = true
 
   co_wait_x_frames(20)
 
-  memory.writebyte(adresses.players[_player_id].character_select_id, 0x0F)
+  memory.writebyte(addresses.players[_player_id].character_select_id, 0x0F)
 end
 
 function update_character_select(_input, _do_fast_forward)
@@ -85,7 +85,7 @@ function update_character_select(_input, _do_fast_forward)
   end
 
   -- Infinite select time
-  --memory.writebyte(adresses.global.character_select_timer, 0x30)
+  --memory.writebyte(addresses.global.character_select_timer, 0x30)
 
   if (character_select_coroutine ~= nil) then
     make_input_empty(_input)

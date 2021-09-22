@@ -34,7 +34,7 @@ end
 
 gamestate.read_game_vars = function ()
   -- frame number
-  gamestate.frame_number = memory.readbyte(adresses.global.frame_number)
+  gamestate.frame_number = memory.readbyte(addresses.global.frame_number)
 
   -- is in match
   local _previous_is_in_match = gamestate.is_in_match
@@ -85,7 +85,7 @@ gamestate.get_character_select_state = function (id)
   if (memory.readword(0xFF8008) ~= 0) then
     return 5
   end
-  if (memory.readbyte(adresses.players[id].base + 0x80) == 0x44) then
+  if (memory.readbyte(addresses.players[id].base + 0x80) == 0x44) then
     return 5
   end
   return 2
