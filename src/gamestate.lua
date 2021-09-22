@@ -166,6 +166,14 @@ function gamestate.read_game_vars()
   has_match_just_started = not _previous_is_in_match and gamestate.is_in_match
 end
 
+function gamestate.read_screen_information()
+  -- screen stuff
+  screen_x = memory.readwordsigned(0x02026CB0)
+  screen_y = memory.readwordsigned(0x02026CB4)
+  scale = memory.readwordsigned(0x0200DCBA) --FBA can't read from 04xxxxxx
+  scale = 0x40/(scale > 0 and scale or 1)
+end
+
 function read_input(_player_obj)
 
   function read_single_input(_input_object, _input_name, _input)

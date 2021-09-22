@@ -70,7 +70,7 @@ end
 
 function before_frame()
 
-  display_update()
+  gamestate.read_screen_information()
   gamestate.read()
 
   if developer_mode then

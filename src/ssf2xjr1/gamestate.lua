@@ -90,3 +90,12 @@ gamestate.get_character_select_state = function (id)
   end
   return 2
 end
+
+gamestate.read_screen_information = function ()
+  -- screen stuff
+  screen_x = memory.readword(0xFF8ED4)
+  screen_y = memory.readword(0xFF8ED8)
+  --~ scale = memory.readwordsigned(0x0200DCBA) --FBA can't read from 04xxxxxx
+  --~ scale = 0x40/(scale > 0 and scale or 1)
+  scale = 1 -- fixme
+end

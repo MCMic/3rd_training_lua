@@ -2258,7 +2258,7 @@ function before_frame()
   counter_attack_delay_item.object = recording_slots[training_settings.current_recording_slot]
   counter_attack_random_deviation_item.object = recording_slots[training_settings.current_recording_slot]
 
-  display_update()
+  gamestate.read_screen_information()
 
   -- gamestate
   local _previous_dummy_char_str = gamestate.player_objects[2].char_str or ""

@@ -236,17 +236,6 @@ screen_y = 0
 scale = 1
 ground_offset = 23
 
-function display_update()
-
-  -- screen stuff
-  screen_x = memory.readwordsigned(0x02026CB0)
-  screen_y = memory.readwordsigned(0x02026CB4)
-  scale = memory.readwordsigned(0x0200DCBA) --FBA can't read from 04xxxxxx
-  scale = 0x40/(scale > 0 and scale or 1)
-
-end
-
-
 function display_draw_printed_geometry()
   -- printed geometry
   for _i, _geometry in ipairs(printed_geometry) do
