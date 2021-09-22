@@ -19,5 +19,5 @@ rom_memory_addresses = loadfile("src/" .. rom_name .. "/memory_addresses.lua")
 if (rom_memory_addresses ~= nil) then
   rom_memory_addresses()
 else
-  require("src/memory_addresses")
+  require("src/sfiii3nr1/memory_addresses")
 end
