@@ -10,13 +10,14 @@ gamestate.read = function ()
   read_player_vars(gamestate.player_objects[1])
   read_player_vars(gamestate.player_objects[2])
 
-  --~ -- projectiles
+  -- projectiles
   --~ read_projectiles()
+  projectiles = projectiles or {}
 
-  --~ if gamestate.is_in_match then
-    --~ update_flip_input(gamestate.player_objects[1], gamestate.player_objects[2])
-    --~ update_flip_input(gamestate.player_objects[2], gamestate.player_objects[1])
-  --~ end
+  if gamestate.is_in_match then
+    update_flip_input(gamestate.player_objects[1], gamestate.player_objects[2])
+    update_flip_input(gamestate.player_objects[2], gamestate.player_objects[1])
+  end
 
   --~ function update_player_relationships(_self, _other)
     --~ -- Can't do this inside read_player_vars cause we need both players to have read their stuff
@@ -34,7 +35,8 @@ end
 
 gamestate.read_game_vars = function ()
   -- frame number
-  gamestate.frame_number = memory.readbyte(addresses.global.frame_number)
+  --~ gamestate.frame_number = memory.readbyte(addresses.global.frame_number)
+  gamestate.frame_number = emu.framecount()
 
   -- is in match
   local _previous_is_in_match = gamestate.is_in_match
@@ -43,8 +45,12 @@ gamestate.read_game_vars = function ()
   has_match_just_started = not _previous_is_in_match and gamestate.is_in_match
 end
 
+function gamestate.is_object_invalid (_obj)
+  return (memory.readword(_obj.base) <= 0x0100)
+end
+
 gamestate.read_game_object = function (_obj)
-  if memory.readword(_obj.base) <= 0x0100 then --invalid objects
+  if gamestate.is_object_invalid(_obj) then --invalid objects
     return false
   end
 

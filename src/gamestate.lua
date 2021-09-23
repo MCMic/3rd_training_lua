@@ -171,8 +171,8 @@ function read_box(_obj, _ptr, _type)
 end
 
 function read_player_vars(_player_obj)
-  if memory.readdword(_player_obj.base + 0x2A0) == 0 then --invalid objects
-    return
+  if gamestate.is_object_invalid(_player_obj) then --invalid objects
+    return false
   end
 
   local _debug_state_variables = _player_obj.debug_state_variables

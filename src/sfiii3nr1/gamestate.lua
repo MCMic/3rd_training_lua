@@ -63,8 +63,12 @@ function gamestate.get_character_select_state(id)
   return memory.readbyte(addresses.players[id].character_select_state)
 end
 
+function gamestate.is_object_invalid (_obj)
+  return (memory.readdword(_obj.base + 0x2A0) == 0)
+end
+
 function gamestate.read_game_object(_obj)
-  if memory.readdword(_obj.base + 0x2A0) == 0 then --invalid objects
+  if gamestate.is_object_invalid(_obj) then --invalid objects
     return false
   end
 
