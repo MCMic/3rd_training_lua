@@ -85,7 +85,7 @@ gamestate.get_character_select_state = function (id)
   if (memory.readword(0xFF8008) ~= 0) then
     return 5
   end
-  if (memory.readbyte(addresses.players[id].base + 0x80) == 0x44) then
+  if (memory.readbyte(addresses.players[id].base + 0x80) > 0x30) then
     return 5
   end
   return 2
