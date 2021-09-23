@@ -2378,7 +2378,7 @@ function before_frame()
   update_wakeupdata_recording(player, dummy)
 
   local _debug_position_prediction = false
-  if _debug_position_prediction and player.pos_y > 0 then
+  if _debug_position_prediction and player.pos_y ~= nil and player.pos_y > 0 then
     local _px, _py = game_to_screen_space(player.pos_x, player.pos_y)
     print_point(_px, _py, 0x00FFFFFF)
     local _prediction = predict_object_position(player, 2)
@@ -2469,8 +2469,8 @@ function on_gui()
       local _i = joypad.get()
       local _p1 = make_input_history_entry("P1", _i)
       local _p2 = make_input_history_entry("P2", _i)
-      draw_controller_big(_p1, 44, 34)
-      draw_controller_big(_p2, 310, 34)
+      draw_controller_big(_p1, rom.p1input.x, rom.p1input.y)
+      draw_controller_big(_p2, rom.p2input.x, rom.p2input.y)
     end
 
     -- move advantage
@@ -2519,8 +2519,7 @@ function on_gui()
     local _gauge_x_scale = 4
 
     if training_settings.special_training_follow_character then
-      local _px = _player.pos_x - screen_x + emu.screenwidth()/2
-      local _py = emu.screenheight() - (_player.pos_y - screen_y) - ground_offset
+      local _px, _py = game_to_screen_space(_player.pos_x, _player.pos_y)
       local _half_width = 23 * _gauge_x_scale * 0.5
       _x = _px - _half_width
       _x = math.max(_x, 4)
@@ -2624,8 +2623,7 @@ function on_gui()
     local _gauge_x_scale = 1
 
     if training_settings.special_training_follow_character then
-      local _px = _player.pos_x - screen_x + emu.screenwidth()/2
-      local _py = emu.screenheight() - (_player.pos_y - screen_y) - ground_offset
+      local _px, _py = game_to_screen_space(_player.pos_x, _player.pos_y)
       local _half_width = 23 * _gauge_x_scale * 0.5
       _x = _px - _half_width
       _x = math.max(_x, 4)

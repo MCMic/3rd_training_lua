@@ -148,28 +148,6 @@ function read_input(_player_obj)
   read_single_input(_player_obj.input, "HK", _local_input[_player_obj.prefix.." Strong Kick"])
 end
 
-function read_box(_obj, _ptr, _type)
-  if _obj.friends > 1 then --Yang SA3
-    if _type ~= "attack" then
-      return
-    end
-  end
-
-  local _box = {
-    left   = memory.readwordsigned(_ptr + 0x0),
-    width  = memory.readwordsigned(_ptr + 0x2),
-    bottom = memory.readwordsigned(_ptr + 0x4),
-    height = memory.readwordsigned(_ptr + 0x6),
-    type   = _type,
-  }
-
-  if _box.left == 0 and _box.width == 0 and _box.height == 0 and _box.bottom == 0 then
-    return
-  end
-
-  table.insert(_obj.boxes, _box)
-end
-
 function read_player_vars(_player_obj)
   if gamestate.is_object_invalid(_player_obj) then --invalid objects
     return false

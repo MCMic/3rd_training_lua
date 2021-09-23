@@ -234,7 +234,6 @@ printed_geometry = {}
 screen_x = 0
 screen_y = 0
 scale = 1
-ground_offset = 23
 
 function display_draw_printed_geometry()
   -- printed geometry
@@ -366,7 +365,7 @@ end
 -- # tools
 function game_to_screen_space(_x, _y)
   local _px = _x - screen_x + emu.screenwidth()/2
-  local _py = emu.screenheight() - (_y - screen_y) - ground_offset
+  local _py = emu.screenheight() - (_y - screen_y) - rom.ground_offset
   return _px, _py
 end
 

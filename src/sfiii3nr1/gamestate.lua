@@ -112,8 +112,30 @@ function gamestate.read_game_object(_obj)
 
   for _, _box in ipairs(_boxes) do
     for i = _box.initial, _box.number do
-      read_box(_obj, memory.readdword(_obj.base + _box.offset) + (i-1)*8, _box.type)
+      gamestate.read_box(_obj, memory.readdword(_obj.base + _box.offset) + (i-1)*8, _box.type)
     end
   end
   return true
+end
+
+function gamestate.read_box(_obj, _ptr, _type)
+  if _obj.friends > 1 then --Yang SA3
+    if _type ~= "attack" then
+      return
+    end
+  end
+
+  local _box = {
+    left   = memory.readwordsigned(_ptr + 0x0),
+    width  = memory.readwordsigned(_ptr + 0x2),
+    bottom = memory.readwordsigned(_ptr + 0x4),
+    height = memory.readwordsigned(_ptr + 0x6),
+    type   = _type,
+  }
+
+  if _box.left == 0 and _box.width == 0 and _box.height == 0 and _box.bottom == 0 then
+    return
+  end
+
+  table.insert(_obj.boxes, _box)
 end

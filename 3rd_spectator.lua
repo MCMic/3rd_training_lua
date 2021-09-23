@@ -109,12 +109,12 @@ function on_gui()
     local _i = joypad.get()
     if spectator_settings.display_controllers == 1 or spectator_settings.display_controllers == 2 then
       local _p1 = make_input_history_entry("P1", _i)
-      draw_controller_big(_p1, 44, 34)
+      draw_controller_big(_p1, rom.p1input.x, rom.p1input.y)
     end
 
     if spectator_settings.display_controllers == 1 or spectator_settings.display_controllers == 3 then
       local _p2 = make_input_history_entry("P2", _i)
-      draw_controller_big(_p2, 310, 34)
+      draw_controller_big(_p2, rom.p2input.x, rom.p2input.y)
     end
 
     -- hitboxes

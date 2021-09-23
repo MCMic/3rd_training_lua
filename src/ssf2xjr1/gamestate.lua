@@ -77,30 +77,60 @@ gamestate.read_game_object = function (_obj)
     return false
   end
 
-  _obj.friends = 0
-  _obj.flip_x = memory.readbyte(_obj.base + 0x12) -- testme
+  _obj.flip_x         = memory.readbyte(_obj.base + 0x12) -- testme
   _obj.previous_pos_x = _obj.pos_x or 0
   _obj.previous_pos_y = _obj.pos_y or 0
-  _obj.pos_x = memory.readwordsigned(_obj.base + 0x06)
-  _obj.pos_y = memory.readwordsigned(_obj.base + 0x0A)
-  _obj.char_id = memory.readword(_obj.base + 0x390)
+  _obj.pos_x          = memory.readwordsigned(_obj.base + 0x06)
+  _obj.pos_y          = memory.readwordsigned(_obj.base + 0x0A)
+  _obj.char_id        = memory.readword(_obj.base + 0x390)
+  _obj.animation_ptr  = memory.readdword(_obj.base + 0x1A)
+  _obj.hitbox_ptr     = memory.readdword(_obj.base + 0x34)
 
   _obj.boxes = {}
   local _boxes = {
-    --~ {initial = 1, offset = 0x2D4, type = "push", number = 1},
-    --~ {initial = 1, offset = 0x2C0, type = "throwable", number = 1},
-    --~ {initial = 1, offset = 0x2A0, type = "vulnerability", number = 4},
-    --~ {initial = 1, offset = 0x2A8, type = "ext. vulnerability", number = 4},
-    --~ {initial = 1, offset = 0x2C8, type = "attack", number = 4},
-    --~ {initial = 1, offset = 0x2B8, type = "throw", number = 1}
+    {addr_table = 0x0, id_ptr = 0x8, id_space = 0x04, type = "vulnerability"},
+    {addr_table = 0x2, id_ptr = 0x9, id_space = 0x04, type = "vulnerability"},
+    {addr_table = 0x4, id_ptr = 0xA, id_space = 0x04, type = "vulnerability"},
+    {addr_table = 0x6, id_ptr = 0xC, id_space = 0x10, type = "attack"},
+    {addr_table = 0x8, id_ptr = 0xD, id_space = 0x04, type = "push"},
+    --~ throw_box_list = {
+      --~ {param_offset = 0x6C, type = "throwable"},
+      --~ {param_offset = 0x64, type = "throw"},
+    --~ }
   }
 
   for _, _box in ipairs(_boxes) do
-    for i = _box.initial, _box.number do
-      read_box(_obj, memory.readdword(_obj.base + _box.offset) + (i-1)*8, _box.type)
-    end
+    gamestate.read_box(_obj, _box)
   end
   return true
+end
+
+function gamestate.read_box(_obj, _box)
+  local box = {
+    type = _box.type,
+    id = memory.readbyte(_obj.animation_ptr + _box.id_ptr),
+  }
+
+  if (box.id == 0) then
+    return
+  end
+
+  box.address = _obj.hitbox_ptr + memory.readwordsigned(_obj.hitbox_ptr + _box.addr_table) + box.id * _box.id_space
+  box.hval   = memory.readbytesigned(box.address + 0)
+  box.hval2  = memory.readbyte(box.address + 5)
+  if box.hval2 >= 0x80 and box.type == "attack" then
+    box.hval = -box.hval2
+  end
+  box.vval  = memory.readbytesigned(box.address + 1)
+  box.hrad  = memory.readbyte(box.address + 2)
+  box.vrad  = memory.readbyte(box.address + 3)
+
+  box.left   = box.hval - box.hrad
+  box.width  = box.hrad * 2
+  box.bottom = box.vval - box.vrad
+  box.height = box.vrad * 2
+
+  table.insert(_obj.boxes, box)
 end
 
 -- - 0 is no player
@@ -127,4 +157,11 @@ gamestate.read_screen_information = function ()
   --~ scale = memory.readwordsigned(0x0200DCBA) --FBA can't read from 04xxxxxx
   --~ scale = 0x40/(scale > 0 and scale or 1)
   scale = 1 -- fixme
+end
+
+-- # tools
+function game_to_screen_space(_x, _y)
+  local _px = _x - screen_x
+  local _py = emu.screenheight() - (_y - screen_y) - rom.ground_offset
+  return _px, _py
 end
