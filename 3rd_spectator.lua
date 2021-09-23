@@ -78,7 +78,7 @@ function before_frame()
     {
       infinite_time = true,
     }
-    write_game_vars(_write_game_vars_settings)
+    gamestate.write_game_vars(_write_game_vars_settings)
   end
 
   local _input = joypad.get()

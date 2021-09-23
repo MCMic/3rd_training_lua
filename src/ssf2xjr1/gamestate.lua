@@ -45,6 +45,29 @@ gamestate.read_game_vars = function ()
   has_match_just_started = not _previous_is_in_match and gamestate.is_in_match
 end
 
+-- ## write
+function gamestate.write_game_vars(_settings)
+  -- freeze game
+  if _settings.freeze then
+    --~ memory.writebyte(0x0201136F, 0xFF)
+  else
+    --~ memory.writebyte(0x0201136F, 0x00)
+  end
+
+  -- timer
+  if _settings.infinite_time then
+    timer = memory.readbyte(addresses.global.round_timer)
+    if (timer < 0x98) then
+      memory.writeword(addresses.global.round_timer,0x9928)
+    end
+  end
+
+  -- music
+  --~ if _settings.music_volume then
+    --~ memory.writebyte(0x02078D06, _settings.music_volume * 8)
+  --~ end
+end
+
 function gamestate.is_object_invalid (_obj)
   return (memory.readword(_obj.base) <= 0x0100)
 end

@@ -44,6 +44,26 @@ function gamestate.read_game_vars()
   has_match_just_started = not _previous_is_in_match and gamestate.is_in_match
 end
 
+-- ## write
+function gamestate.write_game_vars(_settings)
+  -- freeze game
+  if _settings.freeze then
+    memory.writebyte(0x0201136F, 0xFF)
+  else
+    memory.writebyte(0x0201136F, 0x00)
+  end
+
+  -- timer
+  if _settings.infinite_time then
+    memory.writebyte(0x02011377, 100)
+  end
+
+  -- music
+  if _settings.music_volume then
+    memory.writebyte(0x02078D06, _settings.music_volume * 8)
+  end
+end
+
 function gamestate.read_screen_information()
   -- screen stuff
   screen_x = memory.readwordsigned(0x02026CB0)

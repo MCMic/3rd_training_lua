@@ -2289,7 +2289,7 @@ function before_frame()
     infinite_time = training_settings.infinite_time,
     music_volume = training_settings.music_volume,
   }
-  write_game_vars(_write_game_vars_settings)
+  gamestate.write_game_vars(_write_game_vars_settings)
 
   write_player_vars(gamestate.player_objects[1])
   write_player_vars(gamestate.player_objects[2])

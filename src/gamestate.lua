@@ -960,27 +960,6 @@ function update_flip_input(_player, _other_player)
   end
 end
 
-
--- ## write
-function write_game_vars(_settings)
-  -- freeze game
-  if _settings.freeze then
-    memory.writebyte(0x0201136F, 0xFF)
-  else
-    memory.writebyte(0x0201136F, 0x00)
-  end
-
-  -- timer
-  if _settings.infinite_time then
-    memory.writebyte(0x02011377, 100)
-  end
-
-  -- music
-  if _settings.music_volume then
-    memory.writebyte(0x02078D06, _settings.music_volume * 8)
-  end
-end
-
 -- # tools
 function update_object_velocity(_object, _debug)
   _debug = _debug or false

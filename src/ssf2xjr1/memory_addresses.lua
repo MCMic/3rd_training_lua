@@ -5,6 +5,7 @@ addresses = {
     frame_number = 0xFF801D,
     screen_x = 0xFF8ED4,
     screen_y = 0xFF8ED8,
+    round_timer = 0xFF8DCE,
   },
   players = {
     {
