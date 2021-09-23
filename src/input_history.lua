@@ -67,7 +67,7 @@ function input_history_update(_history, _prefix, _input)
 end
 
 function input_history_draw(_history, _x, _y, _is_right)
-  local _step_y = 10
+  local _step_y = rom.inputhistory.step_y
   local _j = 0
   for _i = #_history, 1, -1 do
     local _current_y = _y + _j * _step_y

@@ -98,11 +98,11 @@ function on_gui()
 
     -- input history
     if spectator_settings.display_input_history == 1 or spectator_settings.display_input_history == 2 then
-      input_history_draw(input_history[1], 4, 49, false)
+      input_history_draw(input_history[1], rom.inputhistory.x, rom.inputhistory.y, false)
     end
 
     if spectator_settings.display_input_history == 1 or spectator_settings.display_input_history == 3 then
-      input_history_draw(input_history[2], screen_width - 4, 49, true)
+      input_history_draw(input_history[2], screen_width - rom.inputhistory.x, rom.inputhistory.y, true)
     end
 
     -- controllers

@@ -2455,13 +2455,13 @@ function on_gui()
     -- input history
     if training_settings.display_p1_input_history_dynamic and training_settings.display_p1_input_history then
       if gamestate.player_objects[1].pos_x < 320 then
-        input_history_draw(input_history[1], screen_width - 4, 49, true)
+        input_history_draw(input_history[1], screen_width - rom.inputhistory.x, rom.inputhistory.y, true)
       else
-        input_history_draw(input_history[1], 4, 49, false)
+        input_history_draw(input_history[1], rom.inputhistory.x, rom.inputhistory.y, false)
       end
     else
-      if training_settings.display_p1_input_history then input_history_draw(input_history[1], 4, 49, false) end
-      if training_settings.display_p2_input_history then input_history_draw(input_history[2], screen_width - 4, 49, true) end
+      if training_settings.display_p1_input_history then input_history_draw(input_history[1], rom.inputhistory.x, rom.inputhistory.y, false) end
+      if training_settings.display_p2_input_history then input_history_draw(input_history[2], screen_width - rom.inputhistory.x, rom.inputhistory.y, true) end
     end
 
     -- controllers
