@@ -85,7 +85,7 @@ gamestate.get_character_select_state = function (id)
   if (memory.readword(0xFF8008) ~= 0) then
     return 5
   end
-  if (memory.readbyte(addresses.players[id].base + 0x80) > 0x30) then
+  if (memory.readbyte(addresses.players[id].char_select) > 0x30) then
     return 5
   end
   return 2
@@ -93,8 +93,8 @@ end
 
 gamestate.read_screen_information = function ()
   -- screen stuff
-  screen_x = memory.readword(0xFF8ED4)
-  screen_y = memory.readword(0xFF8ED8)
+  screen_x = memory.readword(addresses.global.screen_x)
+  screen_y = memory.readword(addresses.global.screen_y)
   --~ scale = memory.readwordsigned(0x0200DCBA) --FBA can't read from 04xxxxxx
   --~ scale = 0x40/(scale > 0 and scale or 1)
   scale = 1 -- fixme
