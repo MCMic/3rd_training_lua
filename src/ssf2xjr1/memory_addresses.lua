@@ -10,20 +10,9 @@ addresses = {
   players = {
     {
       base = 0xFF844E,
-      -- [byte][read/write] from 0 to 6
-      character_select_row = 0x020154CF,
-
-      -- [byte][read/write] from 0 to 2
-      character_select_col = 0x0201566B,
-
-      -- [byte] used to overwrite shin gouki id
-      character_select_id = 0x02011387,
     },
     {
       base = 0xFF884E,
-      character_select_row = 0x020154D1,
-      character_select_col = 0x0201566D,
-      character_select_id = 0x02011388
     }
   }
 }

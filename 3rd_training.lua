@@ -607,7 +607,7 @@ function backup_recordings()
   if training_settings.recordings == nil then
     training_settings.recordings = {}
   end
-  for _key, _value in ipairs(characters) do
+  for _key, _value in ipairs(rom.characters) do
     if training_settings.recordings[_value] == nil then
       training_settings.recordings[_value] = {}
       for _i = 1, #recording_slots do

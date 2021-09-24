@@ -139,3 +139,61 @@ function gamestate.read_box(_obj, _ptr, _type)
 
   table.insert(_obj.boxes, _box)
 end
+
+function select_gill()
+  character_select_coroutine = coroutine.create(co_select_gill)
+end
+
+function co_select_gill(_input)
+  local _player_id = 0
+
+  local _p1_character_select_state = gamestate.get_character_select_state(1)
+  local _p2_character_select_state = gamestate.get_character_select_state(2)
+
+  if _p1_character_select_state > 2 and _p2_character_select_state > 2 then
+    return
+  end
+
+  if _p1_character_select_state <= 2 then
+    _player_id = 1
+  else
+    _player_id = 2
+  end
+
+  memory.writebyte(addresses.players[_player_id].character_select_col, 3)
+  memory.writebyte(addresses.players[_player_id].character_select_row, 1)
+
+  make_input_empty(_input)
+  _input[gamestate.player_objects[_player_id].prefix.." Weak Punch"] = true
+end
+
+function select_shingouki()
+  character_select_coroutine = coroutine.create(co_select_shingouki)
+end
+
+function co_select_shingouki(_input)
+  local _player_id = 0
+
+  local _p1_character_select_state = gamestate.get_character_select_state(1)
+  local _p2_character_select_state = gamestate.get_character_select_state(2)
+
+  if _p1_character_select_state > 2 and _p2_character_select_state > 2 then
+    return
+  end
+
+  if _p1_character_select_state <= 2 then
+    _player_id = 1
+  else
+    _player_id = 2
+  end
+
+  memory.writebyte(addresses.players[_player_id].character_select_col, 0)
+  memory.writebyte(addresses.players[_player_id].character_select_row, 6)
+
+  make_input_empty(_input)
+  _input[gamestate.player_objects[_player_id].prefix.." Weak Punch"] = true
+
+  co_wait_x_frames(20)
+
+  memory.writebyte(addresses.players[_player_id].character_select_id, 0x0F)
+end

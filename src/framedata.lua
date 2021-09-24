@@ -2,101 +2,24 @@ data_path = "data/"..rom_name.."/"
 framedata_path = data_path.."framedata/"
 frame_data_file_ext = "_framedata.json"
 
-characters =
-{
-  "gill",
-  "alex",
-  "ryu",
-  "yun",
-  "dudley",
-  "necro",
-  "hugo",
-  "ibuki",
-  "elena",
-  "oro",
-  "yang",
-  "ken",
-  "sean",
-  "urien",
-  "gouki",
-  "gill",
-  "chunli",
-  "makoto",
-  "q",
-  "twelve",
-  "remy",
-}
-if rom.is_4rd_strike then
-  characters[1] = "gill"
-  characters[16] = "usean"
-end
-
 -- # Character specific stuff
 character_specific = {}
-for i = 1, #characters do
-  character_specific[characters[i]] = { timed_sa = {false, false, false} }
+for i = 1, #rom.characters do
+  character_specific[rom.characters[i]] = { timed_sa = {false, false, false} }
 end
 
--- ## Character approximate dimensions
-character_specific.alex.half_width = 45
-character_specific.chunli.half_width = 39
-character_specific.dudley.half_width = 29
-character_specific.elena.half_width = 44
-character_specific.gouki.half_width = 33
-character_specific.hugo.half_width = 43
-character_specific.ibuki.half_width = 34
-character_specific.ken.half_width = 30
-character_specific.makoto.half_width = 42
-character_specific.necro.half_width = 26
-character_specific.oro.half_width = 40
-character_specific.q.half_width = 25
-character_specific.remy.half_width = 32
-character_specific.ryu.half_width = 31
-character_specific.sean.half_width = 29
-character_specific.twelve.half_width = 33
-character_specific.urien.half_width = 36
-character_specific.yang.half_width = 41
-character_specific.yun.half_width = 37
-
-character_specific.alex.height = 104
-character_specific.chunli.height = 97
-character_specific.dudley.height = 109
-character_specific.elena.height = 88
-character_specific.gouki.height = 107
-character_specific.hugo.height = 137
-character_specific.ibuki.height = 92
-character_specific.ken.height = 107
-character_specific.makoto.height = 90
-character_specific.necro.height = 89
-character_specific.oro.height = 88
-character_specific.q.height = 130
-character_specific.remy.height = 114
-character_specific.ryu.height = 101
-character_specific.sean.height = 103
-character_specific.twelve.height = 91
-character_specific.urien.height = 121
-character_specific.yang.height = 89
-character_specific.yun.height = 89
-
--- ## Characters standing states
-character_specific.oro.additional_standing_states = { 3 } -- 3 is crouching
-character_specific.dudley.additional_standing_states = { 6 } -- 6 is crouching
-character_specific.makoto.additional_standing_states = { 7 } -- 7 happens during Oroshi
-character_specific.necro.additional_standing_states = { 13 } -- 13 happens during CrLK
-
--- ## Characters timed SA
-character_specific.oro.timed_sa[1] = true;
-character_specific.oro.timed_sa[3] = true;
-character_specific.q.timed_sa[3] = true;
-character_specific.makoto.timed_sa[3] = true;
-character_specific.twelve.timed_sa[3] = true;
-character_specific.yang.timed_sa[3] = true;
-character_specific.yun.timed_sa[3] = true;
+-- Run rom specific character_specific.lua if it exists
+rom_character_specific = loadfile("src/" .. rom_name .. "/character_specific.lua")
+if (rom_character_specific ~= nil) then
+  rom_character_specific()
+else
+  require("src/sfiii3nr1/character_specific")
+end
 
 -- ## Frame data meta
 frame_data_meta = {}
-for i = 1, #characters do
-  frame_data_meta[characters[i]] = {
+for i = 1, #rom.characters do
+  frame_data_meta[rom.characters[i]] = {
     moves = {},
     projectiles = {},
   }
@@ -108,7 +31,7 @@ require(framedata_meta_file_path)
 frame_data = {}
 
 function save_frame_data()
-  for _key, _value in ipairs(characters) do
+  for _key, _value in ipairs(rom.characters) do
     if frame_data[_value].dirty then
       frame_data[_value].dirty = nil
       local _file_path = framedata_path.._value..frame_data_file_ext
@@ -122,7 +45,7 @@ function save_frame_data()
 end
 
 function load_frame_data()
-  for _key, _value in ipairs(characters) do
+  for _key, _value in ipairs(rom.characters) do
     local _file_path = framedata_path.._value..frame_data_file_ext
     frame_data[_value] = read_object_from_json_file(_file_path) or {}
     frame_data[_value].wakeups = frame_data[_value].wakeups or {}

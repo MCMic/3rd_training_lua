@@ -164,7 +164,7 @@ function read_player_vars(_player_obj)
 
   local _previous_movement_type = _player_obj.movement_type or 0
 
-  _player_obj.char_str = characters[_player_obj.char_id + 1]
+  _player_obj.char_str = rom.characters[_player_obj.char_id + 1]
 
   local _previous_remaining_freeze_frames = _player_obj.remaining_freeze_frames or 0
   _player_obj.remaining_freeze_frames = memory.readbyte(_player_obj.base + 0x45)
