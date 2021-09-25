@@ -1,6 +1,8 @@
 
 print("2X!")
 
+gamestate.was_frozen = false
+
 -- ## read
 gamestate.read = function ()
   -- game
@@ -49,13 +51,26 @@ end
 function gamestate.write_game_vars(_settings)
   -- freeze game
   if _settings.freeze then
-    --~ memory.writebyte(0x0201136F, 0xFF)
+    if (not gamestate.was_frozen) then
+      gamestate.previous_turbo = memory.readbyte(addresses.global.turbo)
+      memory.writebyte(addresses.global.turbo, 0xFF) -- Remove frameksip
+    end
+    memory.writeword(addresses.players[1].input, 0x00) -- Remove P1 inputs
+    memory.writeword(addresses.players[2].input, 0x00) -- Remove P2 inputs
+
+    memory.writeword(addresses.global.slowdown, 0xFFFF) -- Maximum slowdown
+
+    gamestate.was_frozen = true
   else
-    --~ memory.writebyte(0x0201136F, 0x00)
+    if (gamestate.was_frozen) then
+      memory.writebyte(addresses.global.turbo, gamestate.previous_turbo) -- Put back turbo
+      memory.writeword(addresses.global.slowdown, 0x00) -- Remove slowdown
+    end
+    gamestate.was_frozen = false
   end
 
   -- timer
-  if _settings.infinite_time then
+  if _settings.infinite_time or _settings.freeze then
     timer = memory.readbyte(addresses.global.round_timer)
     if (timer < 0x98) then
       memory.writeword(addresses.global.round_timer,0x9928)

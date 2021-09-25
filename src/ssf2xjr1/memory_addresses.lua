@@ -6,13 +6,17 @@ addresses = {
     screen_x = 0xFF8ED4,
     screen_y = 0xFF8ED8,
     round_timer = 0xFF8DCE,
+    turbo = 0xFF8CD3,
+    slowdown = 0xFF82F2,
   },
   players = {
     {
       base = 0xFF844E,
+      input = 0xFF8086,
     },
     {
       base = 0xFF884E,
+      input = 0xFF808A,
     }
   }
 }
