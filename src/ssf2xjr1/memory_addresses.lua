@@ -30,6 +30,7 @@ for i = 1, 2 do
   addresses.players[i].char_select    = addresses.players[i].base + 0x80  -- byte
   addresses.players[i].char           = addresses.players[i].base + 0x390 -- word
   addresses.players[i].char_old       = addresses.players[i].base + 0x3B6 -- byte
+  addresses.players[i].gauge_addr     = addresses.players[i].base + 0x2B4 -- byte
 end
   -- 0xFF8008 -> 0 = char select, 10 = ingame, 6/8 = before/between rounds, 4 = intro
   --~ 0xFF8C4F -> stage

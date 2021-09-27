@@ -864,10 +864,10 @@ function update_blocking(_input, _player, _dummy, _mode, _style, _red_parry_hit_
   end
 
   function reset_parry_cooldowns(_player_obj)
-    memory.writebyte(_player_obj.parry_forward_cooldown_time_addr, 0)
-    memory.writebyte(_player_obj.parry_down_cooldown_time_addr, 0)
-    memory.writebyte(_player_obj.parry_air_cooldown_time_addr, 0)
-    memory.writebyte(_player_obj.parry_antiair_cooldown_time_addr, 0)
+    memory.writebyte(_player_obj.addresses.parry_forward_cooldown_time_addr, 0)
+    memory.writebyte(_player_obj.addresses.parry_down_cooldown_time_addr, 0)
+    memory.writebyte(_player_obj.addresses.parry_air_cooldown_time_addr, 0)
+    memory.writebyte(_player_obj.addresses.parry_antiair_cooldown_time_addr, 0)
   end
 
   if not gamestate.is_in_match then
@@ -2103,22 +2103,22 @@ function write_player_vars(_player_obj)
     local _is_timed_sa = character_specific[_player_obj.char_str].timed_sa[_player_obj.selected_sa]
 
     if training_settings.meter_mode == 3 then
-      local _previous_meter_count = memory.readbyte(_player_obj.meter_addr[2])
-      local _previous_meter_count_slave = memory.readbyte(_player_obj.meter_addr[1])
+      local _previous_meter_count = memory.readbyte(_player_obj.addresses.meter_addr[2])
+      local _previous_meter_count_slave = memory.readbyte(_player_obj.addresses.meter_addr[1])
       if _previous_meter_count ~= _player_obj.max_meter_count and _previous_meter_count_slave ~= _player_obj.max_meter_count then
         local _gauge_value = 0
         if _is_timed_sa then
           _gauge_value = _player_obj.max_meter_gauge
         end
-        memory.writebyte(_player_obj.gauge_addr, _gauge_value)
-        memory.writebyte(_player_obj.meter_addr[2], _player_obj.max_meter_count)
-        memory.writebyte(_player_obj.meter_update_flag, 0x01)
+        memory.writebyte(_player_obj.addresses.gauge_addr, _gauge_value)
+        memory.writebyte(_player_obj.addresses.meter_addr[2], _player_obj.max_meter_count)
+        memory.writebyte(_player_obj.addresses.meter_update_flag, 0x01)
       end
     elseif training_settings.meter_mode == 2 then
       if _player_obj.is_idle and _player_obj.idle_time > training_settings.meter_refill_delay then
-        local _previous_gauge = memory.readbyte(_player_obj.gauge_addr)
-        local _previous_meter_count = memory.readbyte(_player_obj.meter_addr[2])
-        local _previous_meter_count_slave = memory.readbyte(_player_obj.meter_addr[1])
+        local _previous_gauge = memory.readbyte(_player_obj.addresses.gauge_addr)
+        local _previous_meter_count = memory.readbyte(_player_obj.addresses.meter_addr[2])
+        local _previous_meter_count_slave = memory.readbyte(_player_obj.addresses.meter_addr[1])
 
         if _previous_meter_count == _previous_meter_count_slave then
           local _meter = 0
@@ -2139,8 +2139,8 @@ function write_player_vars(_player_obj)
 
           local _wanted_gauge = _meter % _player_obj.max_meter_gauge
           local _wanted_meter_count = math.floor(_meter / _player_obj.max_meter_gauge)
-          local _previous_meter_count = memory.readbyte(_player_obj.meter_addr[2])
-          local _previous_meter_count_slave = memory.readbyte(_player_obj.meter_addr[1])
+          local _previous_meter_count = memory.readbyte(_player_obj.addresses.meter_addr[2])
+          local _previous_meter_count_slave = memory.readbyte(_player_obj.addresses.meter_addr[1])
 
           if character_specific[_player_obj.char_str].timed_sa[_player_obj.selected_sa] and _wanted_meter_count == 1 and _wanted_gauge == 0 then
             _wanted_gauge = _player_obj.max_meter_gauge
@@ -2151,11 +2151,11 @@ function write_player_vars(_player_obj)
           --end
 
           if _wanted_gauge ~= _previous_gauge then
-            memory.writebyte(_player_obj.gauge_addr, _wanted_gauge)
+            memory.writebyte(_player_obj.addresses.gauge_addr, _wanted_gauge)
           end
           if _previous_meter_count ~= _wanted_meter_count then
-            memory.writebyte(_player_obj.meter_addr[2], _wanted_meter_count)
-            memory.writebyte(_player_obj.meter_update_flag, 0x01)
+            memory.writebyte(_player_obj.addresses.meter_addr[2], _wanted_meter_count)
+            memory.writebyte(_player_obj.addresses.meter_update_flag, 0x01)
           end
         end
       end
@@ -2163,13 +2163,13 @@ function write_player_vars(_player_obj)
   end
 
   if training_settings.infinite_sa_time and _player_obj.is_in_timed_sa then
-    memory.writebyte(_player_obj.gauge_addr, _player_obj.max_meter_gauge)
+    memory.writebyte(_player_obj.addresses.gauge_addr, _player_obj.max_meter_gauge)
   end
 
   -- STUN
   if training_settings.stun_mode == 2 then
-    memory.writebyte(_player_obj.stun_timer_addr, 0);
-    memory.writedword(_player_obj.stun_bar_addr, 0);
+    memory.writebyte(_player_obj.addresses.stun_timer_addr, 0);
+    memory.writedword(_player_obj.addresses.stun_bar_addr, 0);
   elseif training_settings.stun_mode == 3 then
     if gamestate.is_in_match and not is_menu_open and _player_obj.is_idle then
       local _wanted_stun = 0
@@ -2181,11 +2181,11 @@ function write_player_vars(_player_obj)
       _wanted_stun = math.max(_wanted_stun, 0)
 
       if _player_obj.stun_bar < _wanted_stun then
-        memory.writedword(_player_obj.stun_bar_addr, bit.lshift(_wanted_stun, 24));
+        memory.writedword(_player_obj.addresses.stun_bar_addr, bit.lshift(_wanted_stun, 24));
       elseif _player_obj.is_idle and _player_obj.idle_time > training_settings.stun_reset_delay then
         local _stun = _player_obj.stun_bar
         _stun = math.max(_stun - 1, _wanted_stun)
-        memory.writedword(_player_obj.stun_bar_addr, bit.lshift(_stun, 24));
+        memory.writedword(_player_obj.addresses.stun_bar_addr, bit.lshift(_stun, 24));
       end
     end
   end
