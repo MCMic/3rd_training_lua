@@ -97,7 +97,12 @@ gamestate.read_game_object = function (_obj)
   _obj.previous_pos_y = _obj.pos_y or 0
   _obj.pos_x          = memory.readwordsigned(_obj.base + 0x06)
   _obj.pos_y          = memory.readwordsigned(_obj.base + 0x0A)
-  _obj.char_id        = memory.readword(_obj.base + 0x390)
+  local _char_id      = memory.readword(_obj.base + 0x390)
+  if (_char_id < #rom.characters) then
+    _obj.char_id        = _char_id
+  elseif _obj.char_id == nil then
+    _obj.char_id        = 1
+  end
   _obj.animation_ptr  = memory.readdword(_obj.base + 0x1A)
   _obj.hitbox_ptr     = memory.readdword(_obj.base + 0x34)
 
