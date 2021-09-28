@@ -25,13 +25,14 @@ for i = 1, 2 do
   addresses.players[i].pos_x          = addresses.players[i].base + 0x06  -- wordsigned
   addresses.players[i].pos_y          = addresses.players[i].base + 0x0A  -- wordsigned
   addresses.players[i].flip_x         = addresses.players[i].base + 0x12  -- byte
-  addresses.players[i].animation_ptr  = addresses.players[i].base + 0x1A  -- word
-  addresses.players[i].hitbox_ptr     = addresses.players[i].base + 0x34  -- word
+  addresses.players[i].animation_ptr  = addresses.players[i].base + 0x1A  -- dword
+  addresses.players[i].hitbox_ptr     = addresses.players[i].base + 0x34  -- dword
   addresses.players[i].char_select    = addresses.players[i].base + 0x80  -- byte
   addresses.players[i].char           = addresses.players[i].base + 0x390 -- word
   addresses.players[i].char_old       = addresses.players[i].base + 0x3B6 -- byte
   addresses.players[i].gauge_addr     = addresses.players[i].base + 0x2B4 -- byte
   addresses.players[i].airborn        = addresses.players[i].base + 0x181 -- byte
+  addresses.players[i].hitstun_counter  = addresses.players[i].base + 0x11D -- byte
 end
   -- 0xFF8008 -> 0 = char select, 10 = ingame, 6/8 = before/between rounds, 4 = intro
   --~ 0xFF8C4F -> stage

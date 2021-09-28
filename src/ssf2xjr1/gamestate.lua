@@ -49,6 +49,8 @@ end
 
 -- ## write
 function gamestate.write_game_vars(_settings)
+  memory.writebyte(addresses.global.turbo, 0xFF) -- Remove frameksip for now
+
   -- freeze game
   if _settings.freeze then
     if (not gamestate.was_frozen) then
@@ -201,7 +203,7 @@ function gamestate.read_player_vars(_player_obj)
   _player_obj.action                  = memory.readdword(_player_obj.base + 0xAC)
   _player_obj.action_ext              = memory.readdword(_player_obj.base + 0x12C)
   _player_obj.previous_recovery_time  = _player_obj.recovery_time or 0
-  _player_obj.recovery_time           = memory.readbyte(_player_obj.base + 0x187)
+  --~ _player_obj.recovery_time           = memory.readbyte(_player_obj.base + 0x187)
   _player_obj.movement_type           = memory.readbyte(_player_obj.base + 0x0AD)
   _player_obj.movement_type2          = memory.readbyte(_player_obj.base + 0x0AF) -- seems that we can know which basic movement the player is doing from there
   _player_obj.total_received_projectiles_count = memory.readword(_player_obj.base + 0x430) -- on block or hit
@@ -285,7 +287,7 @@ function gamestate.read_player_vars(_player_obj)
   -- ANIMATION
   local _self_cancel = false
   local _previous_animation = _player_obj.animation or ""
-  _player_obj.animation = bit.tohex(memory.readword(_player_obj.base + 0x202), 4)
+  _player_obj.animation = memory.readdword(_player_obj.addresses.animation_ptr)
   _player_obj.has_animation_just_changed = _previous_animation ~= _player_obj.animation
   if not _player_obj.has_animation_just_changed then
     if (frame_data[_player_obj.char_str] and frame_data[_player_obj.char_str][_player_obj.animation]) then
@@ -467,26 +469,42 @@ function gamestate.read_player_vars(_player_obj)
     end
   end
 
-  local _previous_received_connection_marker = _player_obj.received_connection_marker or 0
-  _player_obj.received_connection_marker = memory.readword(_player_obj.base + 0x32E)
-  _player_obj.received_connection = _previous_received_connection_marker == 0 and _player_obj.received_connection_marker ~= 0
-
   _player_obj.last_movement_type_change_frame = _player_obj.last_movement_type_change_frame or 0
   if _player_obj.movement_type ~= _previous_movement_type then
     _player_obj.last_movement_type_change_frame = gamestate.frame_number
   end
 
   -- is blocking/has just blocked/has just been hit/has_just_parried
-  _player_obj.blocking_id = memory.readbyte(_player_obj.base + 0x3D3)
+  --~ 0x5E -> 0x69
+  --~ 0x6A -> 0x7A
+  --~ 0x7C -> 0x90
+  local _hitstun = memory.readbyte(_player_obj.addresses.hitstun_counter)
+
   _player_obj.has_just_blocked = false
-  if _player_obj.received_connection and _player_obj.received_connection_marker ~= 0xFFF1 and _total_received_hit_count_diff == 0 then --0xFFF1 is parry
+  _player_obj.is_blocking = false
+  _player_obj.recovery_time = 0
+  if (not _player_obj.is_wakingup and _player_obj.posture == 0xE) then
+    if (_hitstun > 0x5E and _hitstun < 0x69) then
+      _player_obj.is_blocking = true
+      _player_obj.recovery_time = 0x69 - _hitstun
+    end
+    if (_hitstun > 0x6A and _hitstun < 0x7A) then
+      _player_obj.is_blocking = true
+      _player_obj.recovery_time = 0x7A - _hitstun
+    end
+    if (_hitstun > 0x7C and _hitstun < 0x90) then
+      _player_obj.is_blocking = true
+      _player_obj.recovery_time = 0x90 - _hitstun
+    end
+  end
+
+  if _player_obj.is_blocking and _player_obj.previous_recovery_time ~= 0 then
     _player_obj.has_just_blocked = true
     log(_player_obj.prefix, "fight", "block")
     if _debug_state_variables then
       print(string.format("%d - %s blocked", gamestate.frame_number, _player_obj.prefix))
     end
   end
-  _player_obj.is_blocking = _player_obj.blocking_id > 0 and _player_obj.blocking_id < 5 or _player_obj.has_just_blocked
 
   _player_obj.has_just_been_hit = false
   if _total_received_hit_count_diff > 0 then
@@ -573,13 +591,9 @@ function gamestate.read_player_vars(_player_obj)
     log(_player_obj.prefix, "fight", string.format("idle %d", to_bit(_player_obj.is_idle)))
   end
 
-
   if gamestate.is_in_match then
 
     -- WAKE UP
-
-    local _previous_is_flying_down_flag = _player_obj.is_flying_down_flag or 0
-    _player_obj.is_flying_down_flag = memory.readbyte(_player_obj.base + 0x8D) -- does not reset to 0 after air reset landings, resets to 0 after jump start
 
     _player_obj.previous_is_wakingup = _player_obj.is_wakingup or false
     _player_obj.is_wakingup = _player_obj.is_wakingup or false
@@ -592,6 +606,7 @@ function gamestate.read_player_vars(_player_obj)
       if debug_wakeup then
         print(string.format("%d - %s wakeup started", gamestate.frame_number, _player_obj.prefix))
       end
+      _player_obj.remaining_wakeup_time = 40 -- fixme
     end
 
     _player_obj.previous_is_fast_wakingup = false
@@ -600,11 +615,14 @@ function gamestate.read_player_vars(_player_obj)
 
     if _player_obj.is_wakingup then
       _player_obj.wakeup_time = _player_obj.wakeup_time + 1
+      _player_obj.remaining_wakeup_time = _player_obj.remaining_wakeup_time - 1
+
     end
 
     if _player_obj.is_wakingup and _previous_posture == 0x0E and _player_obj.posture ~= 0x0E then
+      -- fixme reset wakeup at round end
       if debug_wakeup then
-        print(string.format("%d - %s wake up: %d, %s, %d", gamestate.frame_number, _player_obj.prefix, to_bit(_player_obj.is_fast_wakingup), _player_obj.wakeup_animation, _player_obj.wakeup_time))
+        print(string.format("%d - %s wake up: %s, %d", gamestate.frame_number, _player_obj.prefix, _player_obj.wakeup_animation, _player_obj.wakeup_time))
       end
       _player_obj.is_wakingup = false
       _player_obj.is_past_wakeup_frame = false

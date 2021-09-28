@@ -60,7 +60,7 @@ recording_slot_count = 8
 -- debug options
 developer_mode = false -- Unlock frame data recording options. Touch at your own risk since you may use those options to fuck up some already recorded frame data
 assert_enabled = developer_mode or assert_enabled
-debug_wakeup = false
+debug_wakeup = true
 log_enabled = developer_mode or log_enabled
 log_categories_display =
 {
