@@ -197,26 +197,31 @@ function gamestate.read_player_vars(_player_obj)
   local _previous_posture = _player_obj.posture or 0x00
 
   _player_obj.previous_input_capacity = _player_obj.input_capacity or 0
-  _player_obj.input_capacity = memory.readword(_player_obj.base + 0x46C)
-  _player_obj.action = memory.readdword(_player_obj.base + 0xAC)
-  _player_obj.action_ext = memory.readdword(_player_obj.base + 0x12C)
-  _player_obj.previous_recovery_time = _player_obj.recovery_time or 0
-  _player_obj.recovery_time = memory.readbyte(_player_obj.base + 0x187)
-  _player_obj.movement_type = memory.readbyte(_player_obj.base + 0x0AD)
-  _player_obj.movement_type2 = memory.readbyte(_player_obj.base + 0x0AF) -- seems that we can know which basic movement the player is doing from there
+  _player_obj.input_capacity          = memory.readword(_player_obj.base + 0x46C)
+  _player_obj.action                  = memory.readdword(_player_obj.base + 0xAC)
+  _player_obj.action_ext              = memory.readdword(_player_obj.base + 0x12C)
+  _player_obj.previous_recovery_time  = _player_obj.recovery_time or 0
+  _player_obj.recovery_time           = memory.readbyte(_player_obj.base + 0x187)
+  _player_obj.movement_type           = memory.readbyte(_player_obj.base + 0x0AD)
+  _player_obj.movement_type2          = memory.readbyte(_player_obj.base + 0x0AF) -- seems that we can know which basic movement the player is doing from there
   _player_obj.total_received_projectiles_count = memory.readword(_player_obj.base + 0x430) -- on block or hit
 
--- postures fixme
+-- postures
 --  0x00 -- standing neutral
---  0x08 -- going backwards
---  0x06 -- going forward
---  0x20 -- crouching
---  0x16 -- neutral jump
---  0x14 -- flying forward
---  0x18 -- flying backwards
---  0x1A -- high jump
---  0x26 -- knocked down
+--  0x02 -- crouching
+--  0x04 -- airborn
+--  0x08 -- proximity guard
+--  0x0A -- normal attack
+--  0x0C -- special move
+--  0x0E -- hitstun/blockstun/stun/holdgrabbed
+--  0x14 -- after a throw
   _player_obj.posture = memory.readbyte(_player_obj.base + 0x3)
+-- airborn
+--  0x00 -- On the ground
+--  0x01 -- In the air
+--  0xFF -- Knocked down
+  _player_obj.previous_airborn = _player_obj.airborn or 0
+  _player_obj.airborn = memory.readbyte(_player_obj.addresses.airborn)
 
   _player_obj.busy_flag = memory.readword(_player_obj.base + 0x3D1)
 
@@ -235,22 +240,22 @@ function gamestate.read_player_vars(_player_obj)
   _player_obj.max_meter_count = 1
 
   -- CROUCHED
-  _player_obj.is_crouched = _player_obj.posture == 0x20
+  _player_obj.is_crouched = _player_obj.posture == 0x02
 
   -- LIFE
   _player_obj.life = memory.readbyte(_player_obj.base + 0x9F)
 
   -- BONUSES
-  _player_obj.damage_bonus  = memory.readword(_player_obj.base + 0x43A)
-  _player_obj.stun_bonus    = memory.readword(_player_obj.base + 0x43E)
-  _player_obj.defense_bonus = memory.readword(_player_obj.base + 0x440)
+  _player_obj.damage_bonus  = 0
+  _player_obj.stun_bonus    = 0
+  _player_obj.defense_bonus = 0
 
   -- THROW
   local _previous_is_throwing = _player_obj.is_throwing or false
   _player_obj.is_throwing = bit.rshift(_player_obj.movement_type2, 4) == 9
   _player_obj.has_just_thrown = not _previous_is_throwing and _player_obj.is_throwing
 
-  _player_obj.is_being_thrown = memory.readbyte(_player_obj.base + 0x3CF) ~= 0
+  _player_obj.is_being_thrown = (_player_obj.posture == 0x14)
   _player_obj.throw_countdown = _player_obj.throw_countdown or 0
   _player_obj.previous_throw_countdown = _player_obj.throw_countdown
 
@@ -267,10 +272,7 @@ function gamestate.read_player_vars(_player_obj)
 
   -- ATTACKING
   local _previous_is_attacking = _player_obj.is_attacking or false
-  _player_obj.is_attacking_byte = memory.readbyte(_player_obj.base + 0x428)
-  _player_obj.is_attacking = _player_obj.is_attacking_byte > 0
-  _player_obj.is_attacking_ext_byte = memory.readbyte(_player_obj.base + 0x429)
-  _player_obj.is_attacking_ext = _player_obj.is_attacking_ext_byte > 0
+  _player_obj.is_attacking = (_player_obj.posture == 0x0A or _player_obj.posture == 0x0C) -- I think this does not account for air attack
   _player_obj.has_just_attacked =  _player_obj.is_attacking and not _previous_is_attacking
   if _debug_state_variables and _player_obj.has_just_attacked then print(string.format("%d - %s attacked", gamestate.frame_number, _player_obj.prefix)) end
 
@@ -515,7 +517,11 @@ function gamestate.read_player_vars(_player_obj)
   local _previous_is_in_jump_startup = _player_obj.is_in_jump_startup or false
   _player_obj.is_in_jump_startup = _player_obj.movement_type2 == 0x0C and _player_obj.movement_type == 0x00 and not _player_obj.is_blocking
   _player_obj.previous_standing_state = _player_obj.standing_state or 0
-  _player_obj.standing_state = memory.readbyte(_player_obj.base + 0x297)
+  if (_player_obj.airborn == 0x00) then
+    _player_obj.standing_state = 1
+  else
+    _player_obj.standing_state = 0
+  end
   _player_obj.has_just_landed = is_state_on_ground(_player_obj.standing_state, _player_obj) and not is_state_on_ground(_player_obj.previous_standing_state, _player_obj)
   if _debug_state_variables and _player_obj.has_just_landed then print(string.format("%d - %s landed (%d > %d)", gamestate.frame_number, _player_obj.prefix, _player_obj.previous_standing_state, _player_obj.standing_state)) end
   if _player_obj.debug_standing_state and _player_obj.previous_standing_state ~= _player_obj.standing_state then print(string.format("%d - %s standing state changed (%d > %d)", gamestate.frame_number, _player_obj.prefix, _player_obj.previous_standing_state, _player_obj.standing_state)) end
@@ -547,7 +553,6 @@ function gamestate.read_player_vars(_player_obj)
   _player_obj.idle_time = _player_obj.idle_time or 0
   _player_obj.is_idle = (
     not _player_obj.is_attacking and
-    not _player_obj.is_attacking_ext and
     not _player_obj.is_blocking and
     not _player_obj.is_wakingup and
     not _player_obj.is_being_thrown and
@@ -579,11 +584,7 @@ function gamestate.read_player_vars(_player_obj)
     _player_obj.previous_is_wakingup = _player_obj.is_wakingup or false
     _player_obj.is_wakingup = _player_obj.is_wakingup or false
     _player_obj.wakeup_time = _player_obj.wakeup_time or 0
-    if _previous_is_flying_down_flag == 1 and _player_obj.is_flying_down_flag == 0 and _player_obj.standing_state == 0 and
-      (
-        _player_obj.movement_type ~= 2 -- movement type 2 is hugo's running grab
-        and _player_obj.movement_type ~= 5 -- movement type 5 is ryu's reversal DP on landing
-      ) then
+    if _player_obj.previous_airborn == 0xFF and _player_obj.airborn == 0 then -- and _player_obj.standing_state == 0
       _player_obj.is_wakingup = true
       _player_obj.is_past_wakeup_frame = false
       _player_obj.wakeup_time = 0
@@ -601,7 +602,7 @@ function gamestate.read_player_vars(_player_obj)
       _player_obj.wakeup_time = _player_obj.wakeup_time + 1
     end
 
-    if _player_obj.is_wakingup and _previous_posture == 0x26 and _player_obj.posture ~= 0x26 then
+    if _player_obj.is_wakingup and _previous_posture == 0x0E and _player_obj.posture ~= 0x0E then
       if debug_wakeup then
         print(string.format("%d - %s wake up: %d, %s, %d", gamestate.frame_number, _player_obj.prefix, to_bit(_player_obj.is_fast_wakingup), _player_obj.wakeup_animation, _player_obj.wakeup_time))
       end
