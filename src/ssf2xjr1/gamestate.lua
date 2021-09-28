@@ -571,6 +571,7 @@ function gamestate.read_player_vars(_player_obj)
   _player_obj.idle_time = _player_obj.idle_time or 0
   _player_obj.is_idle = (
     (_player_obj.posture == 0 or _player_obj.posture == 2) and
+    memory.readword(_player_obj.addresses.life) == memory.readword(_player_obj.addresses.life_backup) and -- not the prettiest fix but it does avoid life refill bug
     not _player_obj.is_attacking and
     not _player_obj.is_blocking and
     not _player_obj.is_wakingup and
