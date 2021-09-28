@@ -47,6 +47,7 @@ function make_player_object(_id, _base, _prefix)
       recording_slot = -1,
     },
     throw = {},
+    max_life = 160,
     meter_gauge = 0,
     meter_count = 0,
     max_meter_gauge = 0,

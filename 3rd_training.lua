@@ -2084,17 +2084,16 @@ function write_player_vars(_player_obj)
 
   -- LIFE
   if gamestate.is_in_match and not is_menu_open then
-    local _life = memory.readbyte(_player_obj.base + 0x9F)
+    local _life = _player_obj.life
     if training_settings.life_mode == 2 then
       if _player_obj.is_idle and _player_obj.idle_time > training_settings.life_refill_delay then
         local _refill_rate = 6
-        _life = math.min(_life + _refill_rate, 160)
+        _life = math.min(_life + _refill_rate, _player_obj.max_life)
       end
     elseif training_settings.life_mode == 3 then
-      _life = 160
+      _life = _player_obj.max_life
     end
-    memory.writebyte(_player_obj.base + 0x9F, _life)
-    _player_obj.life = _life
+    gamestate.set_player_life(_player_obj, _life)
   end
 
   -- METER

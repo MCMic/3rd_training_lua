@@ -825,6 +825,11 @@ function gamestate.read_player_vars(_player_obj)
   _player_obj.stun_bar = bit.rshift(memory.readdword(_player_obj.addresses.stun_bar_addr), 24)
 end
 
+function gamestate.set_player_life(_player_obj, _life)
+  memory.writebyte(_player_obj.base + 0x9F, _life)
+  _player_obj.life = _life
+end
+
 function select_gill()
   character_select_coroutine = coroutine.create(co_select_gill)
 end

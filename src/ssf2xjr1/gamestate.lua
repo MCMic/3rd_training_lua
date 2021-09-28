@@ -199,7 +199,7 @@ function gamestate.read_player_vars(_player_obj)
   local _previous_posture = _player_obj.posture or 0x00
 
   _player_obj.previous_input_capacity = _player_obj.input_capacity or 0
-  _player_obj.input_capacity          = memory.readword(_player_obj.base + 0x46C)
+  _player_obj.input_capacity          = 1
   _player_obj.action                  = memory.readdword(_player_obj.base + 0xAC)
   _player_obj.action_ext              = memory.readdword(_player_obj.base + 0x12C)
   _player_obj.previous_recovery_time  = _player_obj.recovery_time or 0
@@ -225,7 +225,7 @@ function gamestate.read_player_vars(_player_obj)
   _player_obj.previous_airborn = _player_obj.airborn or 0
   _player_obj.airborn = memory.readbyte(_player_obj.addresses.airborn)
 
-  _player_obj.busy_flag = memory.readword(_player_obj.base + 0x3D1)
+  _player_obj.busy_flag = 0
 
   local _previous_is_in_basic_action = _player_obj.is_in_basic_action or false
   _player_obj.is_in_basic_action = _player_obj.action < 0xFF and _previous_action < 0xFF -- this triggers one frame early than it should, so we delay it artificially
@@ -245,7 +245,7 @@ function gamestate.read_player_vars(_player_obj)
   _player_obj.is_crouched = _player_obj.posture == 0x02
 
   -- LIFE
-  _player_obj.life = memory.readbyte(_player_obj.base + 0x9F)
+  _player_obj.life = memory.readword(_player_obj.addresses.life)
 
   -- BONUSES
   _player_obj.damage_bonus  = 0
@@ -570,12 +570,12 @@ function gamestate.read_player_vars(_player_obj)
   local _previous_is_idle = _player_obj.is_idle or false
   _player_obj.idle_time = _player_obj.idle_time or 0
   _player_obj.is_idle = (
+    (_player_obj.posture == 0 or _player_obj.posture == 2) and
     not _player_obj.is_attacking and
     not _player_obj.is_blocking and
     not _player_obj.is_wakingup and
     not _player_obj.is_being_thrown and
     not _player_obj.is_in_jump_startup and
-    bit.band(_player_obj.busy_flag, 0xFF) == 0 and
     _player_obj.recovery_time == _player_obj.previous_recovery_time and
     _player_obj.remaining_freeze_frames == 0 and
     _player_obj.input_capacity > 0
@@ -606,7 +606,7 @@ function gamestate.read_player_vars(_player_obj)
       if debug_wakeup then
         print(string.format("%d - %s wakeup started", gamestate.frame_number, _player_obj.prefix))
       end
-      _player_obj.remaining_wakeup_time = 40 -- fixme
+      _player_obj.remaining_wakeup_time = 39 -- fixme
     end
 
     _player_obj.previous_is_fast_wakingup = false
@@ -651,6 +651,35 @@ function gamestate.read_player_vars(_player_obj)
   -- STUN
   _player_obj.stun_max    = 100 -- fixme
   _player_obj.stun_bar    = memory.readbyte(_player_obj.base + 0x5F)
+end
+
+function gamestate.reset_player_objects()
+  gamestate.player_objects = {
+    make_player_object(1, addresses.players[1].base, "P1"),
+    make_player_object(2, addresses.players[2].base, "P2")
+  }
+
+  gamestate.P1 = gamestate.player_objects[1]
+  gamestate.P2 = gamestate.player_objects[2]
+  gamestate.P1.max_life = 144
+  gamestate.P2.max_life = 144
+end
+
+function gamestate.set_player_life(_player_obj, _life)
+  if (_player_obj.life == _life) then
+    return
+  end
+  print(string.format("%04X %04X %04X %04X",
+    memory.readword(_player_obj.addresses.life),
+    memory.readword(_player_obj.addresses.life_backup),
+    memory.readword(_player_obj.addresses.life_hud),
+    _life
+  ))
+  -- fixme with infinite life, causes problems
+  memory.writeword(_player_obj.addresses.life, _life)
+  memory.writeword(_player_obj.addresses.life_backup, _life)
+  memory.writeword(_player_obj.addresses.life_hud, _life)
+  _player_obj.life = _life
 end
 
 -- - 0 is no player

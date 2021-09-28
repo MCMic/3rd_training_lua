@@ -262,7 +262,7 @@ function display_draw_life(_player_object)
   local _x = 0
   local _y = 20
 
-  local _t = string.format("%d/160", _player_object.life)
+  local _t = string.format("%d/%d", _player_object.life, _player_object.max_life)
 
   if _player_object.id == 1 then
     _x = 13
