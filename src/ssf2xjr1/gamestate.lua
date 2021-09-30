@@ -94,19 +94,19 @@ gamestate.read_game_object = function (_obj)
     return false
   end
 
-  _obj.flip_x         = memory.readbyte(_obj.base + 0x12) -- testme
+  _obj.flip_x         = memory.readbyte(_obj.addresses.flip_x)
   _obj.previous_pos_x = _obj.pos_x or 0
   _obj.previous_pos_y = _obj.pos_y or 0
-  _obj.pos_x          = memory.readwordsigned(_obj.base + 0x06)
-  _obj.pos_y          = memory.readwordsigned(_obj.base + 0x0A)
-  local _char_id      = memory.readword(_obj.base + 0x390)
+  _obj.pos_x          = memory.readwordsigned(_obj.addresses.pos_x)
+  _obj.pos_y          = memory.readwordsigned(_obj.addresses.pos_y)
+  local _char_id      = memory.readword(_obj.addresses.char)
   if (_char_id < #rom.characters) then
     _obj.char_id        = _char_id
   elseif _obj.char_id == nil then
     _obj.char_id        = 1
   end
-  _obj.animation_ptr  = memory.readdword(_obj.base + 0x1A)
-  _obj.hitbox_ptr     = memory.readdword(_obj.base + 0x34)
+  _obj.animation_ptr  = memory.readdword(_obj.addresses.animation_ptr)
+  _obj.hitbox_ptr     = memory.readdword(_obj.addresses.hitbox_ptr)
 
   _obj.boxes = {}
   local _boxes = {
@@ -217,7 +217,7 @@ function gamestate.read_player_vars(_player_obj)
 --  0x0C -- special move
 --  0x0E -- hitstun/blockstun/stun/holdgrabbed
 --  0x14 -- after a throw
-  _player_obj.posture = memory.readbyte(_player_obj.base + 0x3)
+  _player_obj.posture = memory.readbyte(_player_obj.addresses.state)
 -- airborn
 --  0x00 -- On the ground
 --  0x01 -- In the air
@@ -651,7 +651,7 @@ function gamestate.read_player_vars(_player_obj)
 
   -- STUN
   _player_obj.stun_max    = 100 -- fixme
-  _player_obj.stun_bar    = memory.readbyte(_player_obj.base + 0x5F)
+  _player_obj.stun_bar    = memory.readbyte(_player_obj.addresses.stun)
 end
 
 function gamestate.reset_player_objects()

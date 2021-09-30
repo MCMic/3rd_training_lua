@@ -22,6 +22,8 @@ addresses = {
 }
 
 for i = 1, 2 do
+  addresses.players[i].state          = addresses.players[i].base + 0x03  -- byte
+  addresses.players[i].substate       = addresses.players[i].base + 0x04  -- byte
   addresses.players[i].pos_x          = addresses.players[i].base + 0x06  -- wordsigned
   addresses.players[i].pos_y          = addresses.players[i].base + 0x0A  -- wordsigned
   addresses.players[i].flip_x         = addresses.players[i].base + 0x12  -- byte
@@ -30,8 +32,9 @@ for i = 1, 2 do
   addresses.players[i].life           = addresses.players[i].base + 0x2A  -- word
   addresses.players[i].life_backup    = addresses.players[i].base + 0x2C  -- word
   addresses.players[i].life_hud       = addresses.players[i].base + 0x1BC -- word
+  addresses.players[i].stun           = addresses.players[i].base + 0x5F  -- byte
   addresses.players[i].char_select    = addresses.players[i].base + 0x80  -- byte
-  addresses.players[i].char           = addresses.players[i].base + 0x390 -- word
+  addresses.players[i].char           = addresses.players[i].base + 0x391 -- word
   addresses.players[i].char_old       = addresses.players[i].base + 0x3B6 -- byte
   addresses.players[i].gauge_addr     = addresses.players[i].base + 0x2B4 -- byte
   addresses.players[i].airborn        = addresses.players[i].base + 0x181 -- byte
