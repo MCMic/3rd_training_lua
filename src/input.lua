@@ -1,34 +1,59 @@
+local player_keys = {
+  "Up",
+  "Down",
+  "Left",
+  "Right",
+  "Weak Punch",
+  "Medium Punch",
+  "Strong Punch",
+  "Weak Kick",
+  "Medium Kick",
+  "Strong Kick",
+}
 
+local player_keys_extra = {
+  "Start",
+  "Coin",
+}
+
+local sequence_to_key_mapping = {
+  up = "Up",
+  down = "Down",
+  LP = "Weak Punch",
+  MP = "Medium Punch",
+  HP = "Strong Punch",
+  LK = "Weak Kick",
+  MK = "Medium Kick",
+  HK = "Strong Kick",
+}
+
+key_to_sequence_mapping = {}
+for k, v in pairs(sequence_to_key_mapping) do
+  key_to_sequence_mapping[v] = k
+end
+
+-- _input is the input table
+-- _id is the player id (1 or 2)
+-- _extra is whether Start and Coin should also be cleared
+function clear_player_input(_input, _id, _extra)
+  for i, key in pairs(player_keys) do
+    _input["P".._id.." "..key] = false
+  end
+
+  if (_extra) then
+    for i, key in pairs(player_keys_extra) do
+      _input["P".._id.." "..key] = false
+    end
+  end
+end
 
 function make_input_empty(_input)
   if _input == nil then
     return
   end
 
-  _input["P1 Up"] = false
-  _input["P1 Down"] = false
-  _input["P1 Left"] = false
-  _input["P1 Right"] = false
-  _input["P1 Weak Punch"] = false
-  _input["P1 Medium Punch"] = false
-  _input["P1 Strong Punch"] = false
-  _input["P1 Weak Kick"] = false
-  _input["P1 Medium Kick"] = false
-  _input["P1 Strong Kick"] = false
-  _input["P1 Start"] = false
-  _input["P1 Coin"] = false
-  _input["P2 Up"] = false
-  _input["P2 Down"] = false
-  _input["P2 Left"] = false
-  _input["P2 Right"] = false
-  _input["P2 Weak Punch"] = false
-  _input["P2 Medium Punch"] = false
-  _input["P2 Strong Punch"] = false
-  _input["P2 Weak Kick"] = false
-  _input["P2 Medium Kick"] = false
-  _input["P2 Strong Kick"] = false
-  _input["P2 Start"] = false
-  _input["P2 Coin"] = false
+  clear_player_input(_input, 1, true)
+  clear_player_input(_input, 2, true)
 end
 
 -- players
@@ -61,16 +86,7 @@ function process_pending_input_sequence(_player_obj, _input)
   end
 
   -- Cancel all input
-  _input[_player_obj.prefix.." Up"] = false
-  _input[_player_obj.prefix.." Down"] = false
-  _input[_player_obj.prefix.." Left"] = false
-  _input[_player_obj.prefix.." Right"] = false
-  _input[_player_obj.prefix.." Weak Punch"] = false
-  _input[_player_obj.prefix.." Medium Punch"] = false
-  _input[_player_obj.prefix.." Strong Punch"] = false
-  _input[_player_obj.prefix.." Weak Kick"] = false
-  _input[_player_obj.prefix.." Medium Kick"] = false
-  _input[_player_obj.prefix.." Strong Kick"] = false
+  clear_player_input(_input, _player_obj.id, false)
 
   local _gauges_base = 0
   if _player_obj.id == 1 then
@@ -89,22 +105,8 @@ function process_pending_input_sequence(_player_obj, _input)
         if _player_obj.flip_input then _input_name = _input_name.."Right" else _input_name = _input_name.."Left" end
       elseif _current_frame_input[i] == "back" then
         if _player_obj.flip_input then _input_name = _input_name.."Left" else _input_name = _input_name.."Right" end
-      elseif _current_frame_input[i] == "up" then
-        _input_name = _input_name.."Up"
-      elseif _current_frame_input[i] == "down" then
-        _input_name = _input_name.."Down"
-      elseif _current_frame_input[i] == "LP" then
-        _input_name = _input_name.."Weak Punch"
-      elseif _current_frame_input[i] == "MP" then
-        _input_name = _input_name.."Medium Punch"
-      elseif _current_frame_input[i] == "HP" then
-        _input_name = _input_name.."Strong Punch"
-      elseif _current_frame_input[i] == "LK" then
-        _input_name = _input_name.."Weak Kick"
-      elseif _current_frame_input[i] == "MK" then
-        _input_name = _input_name.."Medium Kick"
-      elseif _current_frame_input[i] == "HK" then
-        _input_name = _input_name.."Strong Kick"
+      elseif sequence_to_key_mapping[_current_frame_input[i]] ~= nil then
+        _input_name = _input_name..sequence_to_key_mapping[_current_frame_input[i]]
       elseif _current_frame_input[i] == "h_charge" then
         if _player_obj.char_str == "urien" then
           memory.writeword(_gauges_base + _gauges_offsets[1], 0xFFFF)
@@ -312,49 +314,52 @@ function make_input_sequence(_stick, _button)
 end
 
 -- swap inputs
-function swap_inputs(_out_input_table)
-  function swap(_input)
-    local carry = _out_input_table["P1 ".._input]
-    _out_input_table["P1 ".._input] = _out_input_table["P2 ".._input]
-    _out_input_table["P2 ".._input] = carry
+function swap_inputs(_input)
+  function swap(_key)
+    local carry = _input["P1 ".._key]
+    _input["P1 ".._key] = _input["P2 ".._key]
+    _input["P2 ".._key] = carry
   end
 
-  swap("Up")
-  swap("Down")
-  swap("Left")
-  swap("Right")
-  swap("Weak Punch")
-  swap("Medium Punch")
-  swap("Strong Punch")
-  swap("Weak Kick")
-  swap("Medium Kick")
-  swap("Strong Kick")
+  for i, key in pairs(player_keys) do
+    swap(key)
+  end
 end
 
-function stick_input_to_sequence_input(_player_obj, _input)
-  if _input == "Up" then return "up" end
-  if _input == "Down" then return "down" end
-  if _input == "Weak Punch" then return "LP" end
-  if _input == "Medium Punch" then return "MP" end
-  if _input == "Strong Punch" then return "HP" end
-  if _input == "Weak Kick" then return "LK" end
-  if _input == "Medium Kick" then return "MK" end
-  if _input == "Strong Kick" then return "HK" end
+function sequence_input_to_key(_key, _flip_input)
+  if _key == "forward" then
+    if _flip_input then
+      return "Right"
+    else
+      return "Left"
+    end
+  elseif _key == "back" then
+    if _flip_input then
+      return "Left"
+    else
+      return "Right"
+    end
+  else
+    return sequence_to_key_mapping[_key]
+  end
+end
 
-  if _input == "Left" then
-    if _player_obj.flip_input then
+function key_to_sequence_input(_key, _flip_input)
+  if _key == "Left" then
+    if _flip_input then
       return "back"
     else
       return "forward"
     end
   end
 
-  if _input == "Right" then
-    if _player_obj.flip_input then
+  if _key == "Right" then
+    if _flip_input then
       return "forward"
     else
       return "back"
     end
   end
-  return ""
+
+  return key_to_sequence_mapping[_key]
 end

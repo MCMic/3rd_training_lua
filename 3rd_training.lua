@@ -1660,7 +1660,7 @@ function update_recording(_input)
           local _input_name = _key:sub(1 + #player.prefix + 1)
           if (_input_name ~= "Coin" and _input_name ~= "Start") then
             if (_value) then
-              local _sequence_input_name = stick_input_to_sequence_input(player, _input_name)
+              local _sequence_input_name = key_to_sequence_input(_input_name, player.flip_input)
               --print(_input_name.." ".._sequence_input_name)
               table.insert(_frame, _sequence_input_name)
             end
