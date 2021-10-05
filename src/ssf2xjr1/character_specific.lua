@@ -14,7 +14,7 @@ character_specific.blanka.specials = {
   {
     name = "Vertical Roll",
     memory_map = {
-      {0xB0, 0x06} -- Ne fonctionne pas
+      {0xB0, 0x06}
     },
     input = { {"down", "h_charge"}, {"up"} },
     input_variations = {{"LK"}, {"MK"}, {"HK"}},
@@ -22,7 +22,7 @@ character_specific.blanka.specials = {
   {
     name = "Rainbow Roll",
     memory_map = {
-      {0xB9, 0x06} -- 0xB9 à vérifier
+      {0xB9, 0x06}
     },
     input = { {"back", "h_charge"}, {"forward"} },
     input_variations = {{"LK"}, {"MK"}, {"HK"}},
@@ -30,15 +30,17 @@ character_specific.blanka.specials = {
   {
     name = "Electric Thunder",
     memory_map = {
-      {} -- A voir.
+      -- We load all variations
+      {0x9A, 0x05},
+      {0x9C, 0x05},
+      {0x9E, 0x05}
     },
-    input = {},
+    input = {{}},
     input_variations = {{"LP"}, {"MP"}, {"HP"}},
   },
   {
     name = "Forward Dash",
     memory_map = {
-      {} -- A voir.
     },
     input = { {"forward"} },
     input_variations = {{"LK", "MK", "HK"}},
@@ -46,7 +48,6 @@ character_specific.blanka.specials = {
   {
     name = "Backward Dash",
     memory_map = {
-      {} -- A voir.
     },
     input = { {"back"} },
     input_variations = {{"LK", "MK", "HK"}},
@@ -65,7 +66,10 @@ character_specific.boxer.specials = {
   {
     name = "Ground Straight",
     memory_map = {
-      {0x80, 0x06}
+      {0x80, 0x06},
+      {0x88, 0x06},
+      {0xDD, 0x06},
+      {0xD6, 0x06}
     },
     input = { {"back", "h_charge"}, {"forward", "down"} },
     input_variations = {{"LP"}, {"MP"}, {"HP"}},
@@ -73,7 +77,10 @@ character_specific.boxer.specials = {
   {
     name = "Ground Upper",
     memory_map = {
-      {0x86, 0x06}
+      {0x80, 0x06},
+      {0x88, 0x06},
+      {0xDD, 0x06},
+      {0xD6, 0x06}
     },
     input = { {"back", "h_charge"}, {"forward", "down"} },
     input_variations = {{"LK"}, {"MK"}, {"HK"}},
@@ -81,17 +88,23 @@ character_specific.boxer.specials = {
   {
     name = "Straight",
     memory_map = {
-      {0xDD, 0x06}
+      {0x80, 0x06},
+      {0x88, 0x06},
+      {0xDD, 0x06},
+      {0xD6, 0x06}
     },
-	input = { {"back", "h_charge"}, {"forward"} },
+    input = { {"back", "h_charge"}, {"forward"} },
     input_variations = {{"LP"}, {"MP"}, {"HP"}},
   },
   {
     name = "Upper Dash",
     memory_map = {
+      {0x80, 0x06},
+      {0x88, 0x06},
+      {0xDD, 0x06},
       {0xD6, 0x06}
     },
-  input = { {"back", "h_charge"}, {"forward"} },
+    input = { {"back", "h_charge"}, {"forward"} },
     input_variations = {{"LK"}, {"MK"}, {"HK"}},
   },
   {
@@ -99,17 +112,34 @@ character_specific.boxer.specials = {
     memory_map = {
       {0xC0, 0x06}
     },
-	input = { {"down", "h_charge"}, {"up"} },
+    input = { {"down", "v_charge"}, {"up"} },
     input_variations = {{"LP"}, {"MP"}, {"HP"}},
   },
-  {
-    name = "TAP",
-    memory_map = {
-      {} -- A voir
-    },
-	input = {},
-    input_variations = {{"LP", "MP", "HP"}},
-  },
+  --~ 0001 - One
+  --~ 0121 - Two
+  --~ 0241 - Three
+  --~ 0481 - Four
+  --~ 0961 - Five
+  --~ 1441 - Six
+  --~ 1921 - Seven
+  --~ 2401 - Final
+  -- TAP is gonna be hard because it should be negative edge I guess
+  --~ {
+    --~ name = "TAP",
+    --~ memory_map = {
+      --~ {0xB6, 0001} -- A voir
+    --~ },
+    --~ input = {{}},
+    --~ input_variations = {{"LP", "MP", "HP"}},
+  --~ },
+  --~ {
+    --~ name = "TAP Kick",
+    --~ memory_map = {
+      --~ {0xB8, 0001} -- A voir
+    --~ },
+    --~ input = {{}},
+    --~ input_variations = {{"LK", "MK", "HK"}},
+  --~ },
   {
     name = "Crazy Buffalo", -- Voir comment intégrer les différentes phases de la super ?
     memory_map = {
@@ -124,7 +154,7 @@ character_specific.cammy.specials = {
   {
     name = "Spin Knuckle",
     memory_map = {
-      {0xA2, 0x04}
+      {0xA2, 0x06}
     },
     input = { {"back"}, {"back", "down"}, {"forward"} },
     input_variations = {{"LP"}, {"MP"}, {"HP"}},
@@ -132,7 +162,7 @@ character_specific.cammy.specials = {
   {
     name = "Cannon Spike",
     memory_map = {
-      {0x92, 0x04}
+      {0x92, 0x06}
     },
     input = { {"forward"}, {"down"}, {"forward", "down"} },
     input_variations = {{"LK"}, {"MK"}, {"HK"}},
@@ -140,7 +170,7 @@ character_specific.cammy.specials = {
   {
     name = "Spiral Arrow",
     memory_map = {
-      {0x96, 0x04}
+      {0x96, 0x06}
     },
     input = { {"down"}, {"forward", "down"}, {"forward"} },
     input_variations = {{"LK"}, {"MK"}, {"HK"}},
@@ -148,7 +178,7 @@ character_specific.cammy.specials = {
   {
     name = "Hooligan Combination", -- Compléter pour avoir les deux variations
     memory_map = {
-      {0xA9, 0x06}
+      {0xA9, 0x06} -- buggy
     },
     input = { {"back"}, {"down"}, {"forward", "down"}, {"up", "forward"} },
     input_variations = {{"LP"}, {"MP"}, {"HP"}},
@@ -158,7 +188,7 @@ character_specific.cammy.specials = {
     memory_map = {
       {0xA6, 0x08}
     },
-     input = { {"down"}, {"forward", "down"}, {"forward"}, {"down"}, {"forward", "down"} },
+    input = { {"down"}, {"forward", "down"}, {"forward"}, {"down"}, {"forward", "down"} },
     input_variations = {{"LK"}, {"MK"}, {"HK"}},
   }
 }
@@ -169,7 +199,7 @@ character_specific.chunli.specials = {
     memory_map = {
       {0x80, 0x06} -- Ne fonctionne pas
     },
-  input = { {"back", "h_charge"}, {"forward"} },
+    input = { {"back", "h_charge"}, {"forward"} },
     input_variations = {{"LP"}, {"MP"}, {"HP"}},
   },
   {
@@ -185,15 +215,18 @@ character_specific.chunli.specials = {
     memory_map = {
       {0xB0, 0x06}
     },
-  input = { {"back", "h_charge"}, {"forward"} },
+    input = { {"back", "h_charge"}, {"forward"} },
     input_variations = {{"LK"}, {"MK"}, {"HK"}},
   },
   {
     name = "Hyakuretsu Kyaku",
     memory_map = {
-      {} -- A voir
+      -- We load all variations
+      {0x9A, 0x05},
+      {0x9C, 0x05},
+      {0x9E, 0x05}
     },
-	input = {},
+    input = {{}},
     input_variations = {{"LK"}, {"MK"}, {"HK"}},
   },
   {
@@ -228,7 +261,7 @@ character_specific.claw.specials = {
     memory_map = {
       {0x94, 0x06}
     },
-  input = { {"back", "h_charge"}, {"forward"} },
+    input = { {"back", "h_charge"}, {"forward"} },
     input_variations = {{"LP"}, {"MP"}, {"HP"}},
   },
   {
@@ -271,7 +304,7 @@ character_specific.deejay.specials = {
     memory_map = {
       {0x92, 0x06}
     },
-	input = { {"back", "h_charge"}, {"forward"} },
+    input = { {"back", "h_charge"}, {"forward"} },
     input_variations = {{"LP"}, {"MP"}, {"HP"}},
   },
   {
@@ -279,7 +312,7 @@ character_specific.deejay.specials = {
     memory_map = {
       {0xA6, 0x06}
     },
-	input = { {"back", "h_charge"}, {"forward"} },
+    input = { {"back", "h_charge"}, {"forward"} },
     input_variations = {{"LK"}, {"MK"}, {"HK"}},
   },
   {
@@ -303,7 +336,7 @@ character_specific.deejay.specials = {
     memory_map = {
       {0xAF, 0x0A}
     },
-     input = { {"back", "h_charge"}, {"forward"}, {"back"}, {"forward"} },
+    input = { {"back", "h_charge"}, {"forward"}, {"back"}, {"forward"} },
     input_variations = {{"LK"}, {"MK"}, {"HK"}},
   }
 }
@@ -338,7 +371,7 @@ character_specific.dhalsim.specials = {
     memory_map = {
       {0xE0, 0x06} -- Autre valeur à rajouter
     },
-   input = { {"forward"}, {"down"}, {"forward", "down"} },
+    input = { {"forward"}, {"down"}, {"forward", "down"} },
     input_variations = {{"LP", "MP", "HP"},{"LK", "MK", "HK"}},
   },
   {
@@ -346,7 +379,7 @@ character_specific.dhalsim.specials = {
     memory_map = {
       {0xE0, 0x05} -- Autre valeur à rajouter
     },
-   input = { {"back"}, {"down"}, {"back", "down"} },
+    input = { {"back"}, {"down"}, {"back", "down"} },
     input_variations = {{"LP", "MP", "HP"},{"LK", "MK", "HK"}},
   },
   {
@@ -363,9 +396,9 @@ character_specific.dictator.specials = {
   {
     name = "Scissor Kick",
     memory_map = {
-      {0x80, 0x06}
+      {0x88, 0x06}
     },
-	input = { {"back", "h_charge"}, {"forward"} },
+    input = { {"back", "h_charge"}, {"forward"} },
     input_variations = {{"LK"}, {"MK"}, {"HK"}},
   },
   {
@@ -379,7 +412,7 @@ character_specific.dictator.specials = {
   {
     name = "Devil's Reverse",
     memory_map = {
-      {0xAB, 0x06}
+      {0xAC, 0x06}
     },
     input = { {"down", "h_charge"}, {"up"} },
     input_variations = {{"LP"}, {"MP"}, {"HP"}},
@@ -389,7 +422,7 @@ character_specific.dictator.specials = {
     memory_map = {
       {0x80, 0x06}
     },
-  input = { {"back", "h_charge"}, {"forward"} },
+    input = { {"back", "h_charge"}, {"forward"} },
     input_variations = {{"LP"}, {"MP"}, {"HP"}},
   },
   {
@@ -404,21 +437,22 @@ character_specific.dictator.specials = {
 ---------------------------------------------------------------------------------
 character_specific.feilong.specials = {
   {
-    name = "Rekka",
+    name = "Rekka", -- Should be tested if chained rekka works
     memory_map = {
-      {0x90, 0x04}
-    },
-    input = { {"down"}, {"down", "forward"}, {"forward"} },
-    input_variations = {{"LP"}, {"MP"}, {"HP"}},
-  },
-  {
-    name = "Rekka 2",
-    memory_map = {
+      {0x90, 0x04},
       {0xA0, 0x04}
     },
     input = { {"down"}, {"down", "forward"}, {"forward"} },
     input_variations = {{"LP"}, {"MP"}, {"HP"}},
   },
+  --~ {
+    --~ name = "Rekka 2",
+    --~ memory_map = {
+      --~ {0xA0, 0x04}
+    --~ },
+    --~ input = { {"down"}, {"down", "forward"}, {"forward"} },
+    --~ input_variations = {{"LP"}, {"MP"}, {"HP"}},
+  --~ },
   {
     name = "Flame Kick",
     memory_map = {
@@ -428,7 +462,7 @@ character_specific.feilong.specials = {
     input_variations = {{"LK"}, {"MK"}, {"HK"}},
   },
   {
-    name = "Chicken Wing",
+    name = "Chicken Wing", -- Seems buggy
     memory_map = {
       {0xB4, 0x06}
     },
@@ -459,15 +493,15 @@ character_specific.guile.specials = {
     memory_map = {
       {0x86, 0x06}
     },
-    input = { {"down", "h_charge"}, {"up"} },
+    input = { {"down", "v_charge"}, {"up"} },
     input_variations = {{"LK"}, {"MK"}, {"HK"}},
   },
   {
-    name = "Double Somersault", -- A voir
+    name = "Double Somersault",
     memory_map = {
       {0x94, 0x0A}
     },
-    input = { {"down", "h_charge"}, {"forward"}, {"back"}, {"up"} },
+    input = { {"down", "v_charge"}, {"forward"}, {"back"}, {"up"} },
     input_variations = {{"LK"}, {"MK"}, {"HK"}},
   }
 }
@@ -476,7 +510,7 @@ character_specific.ehonda.specials = {
   {
     name = "Flying Headbutt",
     memory_map = {
-      {0x94, 0x06}
+      {0x88, 0x06}
     },
      input = { {"back", "h_charge"}, {"forward"} },
     input_variations = {{"LP"}, {"MP"}, {"HP"}},
@@ -500,15 +534,18 @@ character_specific.ehonda.specials = {
   {
     name = "Hundred Hands Slap",
     memory_map = {
-      {} -- A voir
+      -- We load all variations
+      {0xC6, 0x05},
+      {0xC8, 0x05},
+      {0xCA, 0x05}
     },
-    input = {},
+    input = {{}},
     input_variations = {{"LP"}, {"MP"}, {"HP"}},
   },
   {
     name = "Double Headbutt",
     memory_map = {
-      {0x94, 0x08}
+      {0x94, 0x0A}
     },
     input = { {"back", "h_charge"}, {"forward"}, {"back"}, {"forward"} },
     input_variations = {{"LP"}, {"MP"}, {"HP"}},
@@ -519,9 +556,12 @@ character_specific.thawk.specials = {
   {
     name = "Mexican Typhoon", -- A voir
     memory_map = {
-      {}
+      {0x91,0x04}, -- or 5 if other side
+      {0x92,0x06},
+      {0x93,0x08},
+      {0x94,0x00}
     },
-    input = { },
+    input = {{"back"}}, -- fixme
     input_variations = {{"LP"}, {"MP"}, {"HP"}},
   },
   {
@@ -535,9 +575,8 @@ character_specific.thawk.specials = {
   {
     name = "Double Typhoon", -- A voir
     memory_map = {
-      {}
     },
-    input = {},
+    input = {{}},
     input_variations = {{"LP"}, {"MP"}, {"HP"}},
   }
 }
@@ -646,17 +685,25 @@ character_specific.ryu.specials = {
 ----------------------------------------------------------------------------------------
 character_specific.sagat.specials = {
   {
-    name = "Tiger Shot",
+    name = "Tiger Shot High",
     memory_map = {
-      {0x94, 0x04}
+      {0x88, 0x06}
     },
     input = { {"down"}, {"down", "forward"}, {"forward"} },
-    input_variations = {{"LP"}, {"MP"}, {"HP"}, {"LK"}, {"MK"}, {"HK"}},
+    input_variations = {{"LP"}, {"MP"}, {"HP"}},
+  },
+  {
+    name = "Tiger Shot Low",
+    memory_map = {
+      {0x8C, 0x06}
+    },
+    input = { {"down"}, {"down", "forward"}, {"forward"} },
+    input_variations = {{"LK"}, {"MK"}, {"HK"}},
   },
   {
     name = "Tiger Knee",
     memory_map = {
-      {0x84, 0x04}
+      {0x84, 0x06}
     },
     input = { {"down"}, {"forward"}, {"forward", "up"} },
     input_variations = {{"LK"}, {"MK"}, {"HK"}},
@@ -664,7 +711,7 @@ character_specific.sagat.specials = {
   {
     name = "Tiger Uppercut",
     memory_map = {
-      {0x80, 0x04}
+      {0x80, 0x06}
     },
    input = { {"forward"}, {"down"}, {"down", "forward"} },
     input_variations = {{"LP"}, {"MP"}, {"HP"}},
@@ -672,7 +719,7 @@ character_specific.sagat.specials = {
   {
     name = "Tiger Genocide",
     memory_map = {
-      {0x9E, 0x08}
+      {0x9E, 0x0A}
     },
     input = { {"down"}, {"forward", "down"}, {"forward"}, {"down"}, {"forward", "down"} },
     input_variations = {{"LP"}, {"MP"}, {"HP"}, {"LK"}, {"MK"}, {"HK"}},
@@ -681,43 +728,47 @@ character_specific.sagat.specials = {
 ------------------------------------------------------------------------
 character_specific.zangief.specials = {
   {
-    name = "Bear Grab", -- A voir
+    name = "Bear Grab",
     memory_map = {
-      {}
+      {0x9B,0x06},
+      {0x9C,0x06},
+      {0x9D,0x08},
+      {0x9E,0x00}
     },
-    input = {},
+    input = {{"back"}}, -- fixme
     input_variations = {{"LK"}, {"MK"}, {"HK"}},
   },
   {
     name = "Spinning Pile Driver", -- A voir
     memory_map = {
-      {}
+      {0x80,0x06},
+      {0x81,0x06},
+      {0x82,0x08},
+      {0x83,0x00}
     },
-    input = {},
+    input = {{"back"}}, -- fixme
     input_variations = {{"LP"}, {"MP"}, {"HP"}},
   },
   {
     name = "Banishing Flat",
     memory_map = {
-      {0xB3, 0x0A}
+      {0xB3, 0x06}
     },
     input = { {"forward"}, {"forward", "down"}, {"down"} },
     input_variations = {{"LP"}, {"MP"}, {"HP"}},
   },
   {
     name = "Lariat",
-    memory_map = {
-      {} -- A voir
-    },
-    input = {},
+    memory_map = {},
+    input = {{}},
     input_variations = {{"LP","MP","HP"}, {"LK","MK","HK"}},
   },
   {
     name = "Final Atomic Buster", -- A voir
     memory_map = {
-      {}
+      -- TODO
     },
-    input = {},
+    input = {{}},
     input_variations = {{"LP"}, {"MP"}, {"HP"}},
   }
 }
