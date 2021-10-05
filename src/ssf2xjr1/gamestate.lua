@@ -99,7 +99,7 @@ gamestate.read_game_object = function (_obj)
   _obj.previous_pos_y = _obj.pos_y or 0
   _obj.pos_x          = memory.readwordsigned(_obj.addresses.pos_x)
   _obj.pos_y          = memory.readwordsigned(_obj.addresses.pos_y)
-  local _char_id      = memory.readword(_obj.addresses.char)
+  local _char_id      = memory.readbyte(_obj.addresses.char)
   if (_char_id < #rom.characters) then
     _obj.char_id        = _char_id
   elseif _obj.char_id == nil then
