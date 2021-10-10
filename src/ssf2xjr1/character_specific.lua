@@ -88,10 +88,10 @@ character_specific.boxer.specials = {
   {
     name = "Straight",
     memory_map = {
-      {0x80, 0x06},
-      {0x88, 0x06},
-      {0xDD, 0x06},
-      {0xD6, 0x06}
+      {0x80, 0x08},
+      {0x88, 0x08},
+      {0xDD, 0x08},
+      {0xD6, 0x08}
     },
     input = { {"back", "h_charge"}, {"forward"} },
     input_variations = {{"LP"}, {"MP"}, {"HP"}},
@@ -99,10 +99,10 @@ character_specific.boxer.specials = {
   {
     name = "Upper Dash",
     memory_map = {
-      {0x80, 0x06},
-      {0x88, 0x06},
-      {0xDD, 0x06},
-      {0xD6, 0x06}
+      {0x80, 0x08},
+      {0x88, 0x08},
+      {0xDD, 0x08},
+      {0xD6, 0x08}
     },
     input = { {"back", "h_charge"}, {"forward"} },
     input_variations = {{"LK"}, {"MK"}, {"HK"}},
@@ -197,7 +197,10 @@ character_specific.chunli.specials = {
   {
     name = "Kikouken",
     memory_map = {
-      {0x80, 0x06} -- Ne fonctionne pas
+      {0x80, 0x06}, -- Ne fonctionne pas
+      {0x81, 0x00},
+      {0x82, 0x01},
+      {0x83, 0x01}
     },
     input = { {"back", "h_charge"}, {"forward"} },
     input_variations = {{"LP"}, {"MP"}, {"HP"}},
@@ -243,7 +246,7 @@ character_specific.claw.specials = {
   {
     name = "Wall Dive (Kick)",
     memory_map = {
-      {0x80, 0x06}
+      {0x8C, 0x06} -- broken
     },
     input = { {"down", "h_charge"}, {"up"} },
     input_variations = {{"LK"}, {"MK"}, {"HK"}},
@@ -259,7 +262,7 @@ character_specific.claw.specials = {
   {
     name = "Crystal Flash",
     memory_map = {
-      {0x94, 0x06}
+      {0x88, 0x06}
     },
     input = { {"back", "h_charge"}, {"forward"} },
     input_variations = {{"LP"}, {"MP"}, {"HP"}},
@@ -274,18 +277,14 @@ character_specific.claw.specials = {
   },
   {
     name = "Back Flip (Kick)",
-    memory_map = {
-      {} -- A voir
-    },
-    input = {},
+    memory_map = {},
+    input = {{}},
     input_variations = {{"LK", "MK", "HK"}},
   },
   {
     name = "Back Flip (Punch)",
-    memory_map = {
-      {} -- A voir
-    },
-    input = {},
+    memory_map = {},
+    input = {{}},
     input_variations = {{"LP", "MP", "HP"}},
   },
   {
@@ -402,7 +401,7 @@ character_specific.dictator.specials = {
     input_variations = {{"LK"}, {"MK"}, {"HK"}},
   },
   {
-    name = "Head Stomp", -- Ne fonctionne pas
+    name = "Head Stomp",
     memory_map = {
       {0x91, 0x06}
     },
@@ -467,7 +466,7 @@ character_specific.feilong.specials = {
       {0xB4, 0x06}
     },
     input = { {"back"}, {"down"}, {"forward", "down"}, {"forward", "up"} },
-    input_variations = {{"LK"}, {"MK"}, {"HK"}},
+    input_variations = {{"LK"}},--, {"MK"}, {"HK"} only lk works
   },
   {
     name = "Rekka Sinken",
@@ -741,12 +740,12 @@ character_specific.zangief.specials = {
   {
     name = "Spinning Pile Driver", -- A voir
     memory_map = {
-      {0x80,0x06},
-      {0x81,0x06},
-      {0x82,0x08},
+      {0x80,0x08},
+      {0x81,0x01},
+      {0x82,0x0E},
       {0x83,0x00}
     },
-    input = {{"back"}}, -- fixme
+    input = {{}}, -- fixme
     input_variations = {{"LP"}, {"MP"}, {"HP"}},
   },
   {
