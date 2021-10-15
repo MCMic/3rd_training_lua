@@ -49,7 +49,7 @@ end
 
 -- ## write
 function gamestate.write_game_vars(_settings)
-  memory.writebyte(addresses.global.turbo, 0xFF) -- Remove frameksip for now
+  --~ memory.writebyte(addresses.global.turbo, 0xFF) -- Remove frameksip for now
 
   -- freeze game
   if _settings.freeze then
@@ -156,13 +156,20 @@ function gamestate.read_box(_obj, _box)
 end
 
 function gamestate.read_player_vars(_player_obj)
+  read_input(_player_obj)
+
   if gamestate.is_object_invalid(_player_obj) then --invalid objects
     return false
   end
 
-  local _debug_state_variables = _player_obj.debug_state_variables
+  --~ print(string.format("%08X",memory.readdword(_player_obj.addresses.base + 0x18B3)))
+  --~ gui.text(10, 10*_player_obj.id, string.format("%08X",
+    --~ memory.readdword(_player_obj.addresses.state)
+    --~ memory.readdword(_player_obj.base + 0x27),
+    --~ memory.readword(_player_obj.base + 0x10)
+  --~ ), text_default_color, text_default_border_color)
 
-  read_input(_player_obj)
+  local _debug_state_variables = _player_obj.debug_state_variables
 
   local _prev_pos_x = _player_obj.pos_x or 0
   local _prev_pos_y = _player_obj.pos_y or 0
@@ -208,20 +215,21 @@ function gamestate.read_player_vars(_player_obj)
   _player_obj.movement_type2          = memory.readbyte(_player_obj.base + 0x0AF) -- seems that we can know which basic movement the player is doing from there
   _player_obj.total_received_projectiles_count = memory.readword(_player_obj.base + 0x430) -- on block or hit
 
--- postures
---  0x00 -- standing neutral
---  0x02 -- crouching
---  0x04 -- airborn
---  0x08 -- proximity guard
---  0x0A -- normal attack
---  0x0C -- special move
---  0x0E -- hitstun/blockstun/stun/holdgrabbed
---  0x14 -- after a throw
+  -- postures
+  --  0x00 -- standing neutral
+  --  0x02 -- crouching
+  --  0x04 -- airborn
+  --  0x08 -- proximity guard
+  --  0x0A -- normal attack
+  --  0x0C -- special move
+  --  0x0E -- hitstun/blockstun/stun/holdgrabbed
+  --  0x14 -- after a throw
   _player_obj.posture = memory.readbyte(_player_obj.addresses.state)
--- airborn
---  0x00 -- On the ground
---  0x01 -- In the air
---  0xFF -- Knocked down
+  _player_obj.substate = memory.readbyte(_player_obj.addresses.substate)
+  -- airborn
+  --  0x00 -- On the ground
+  --  0x01 -- In the air
+  --  0xFF -- Knocked down
   _player_obj.previous_airborn = _player_obj.airborn or 0
   _player_obj.airborn = memory.readbyte(_player_obj.addresses.airborn)
 

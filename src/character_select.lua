@@ -22,7 +22,7 @@ end
 
 function update_character_select(_input, _do_fast_forward)
 
-  if not character_select_sequence_state == 0 then
+  if character_select_sequence_state == 0 then
     return
   end
 

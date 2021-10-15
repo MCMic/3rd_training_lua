@@ -8,6 +8,7 @@ addresses = {
     round_timer = 0xFF8DCE,
     turbo = 0xFF8CD3,
     slowdown = 0xFF82F2,
+    stage_select = 0xFF8C4F, -- 8C51
   },
   players = {
     {
