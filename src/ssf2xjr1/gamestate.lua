@@ -244,9 +244,13 @@ function gamestate.read_player_vars(_player_obj)
   _player_obj.has_just_ended_recovery = _previous_recovery_flag ~= 0 and _player_obj.recovery_flag == 0
 
   _player_obj.meter_gauge = memory.readbyte(_player_obj.addresses.gauge_addr)
-  _player_obj.meter_count = 0
-  _player_obj.selected_sa = 1
   _player_obj.max_meter_gauge = 48
+  if (_player_obj.meter_gauge >= _player_obj.max_meter_gauge) then
+    _player_obj.meter_count = 1
+  else
+    _player_obj.meter_count = 0
+  end
+  _player_obj.selected_sa = 1
   _player_obj.max_meter_count = 1
 
   -- CROUCHED
@@ -689,6 +693,36 @@ function gamestate.set_player_life(_player_obj, _life)
   memory.writeword(_player_obj.addresses.life_backup, _life)
   memory.writeword(_player_obj.addresses.life_hud, _life)
   _player_obj.life = _life
+end
+
+function gamestate.refill_meter(_player_obj, _wanted_meter)
+  local _previous_gauge = memory.readbyte(_player_obj.addresses.gauge_addr)
+
+  local _meter = memory.readbyte(_player_obj.addresses.gauge_addr)
+
+  if _meter > _wanted_meter then
+    _meter = _meter - 6
+    _meter = math.max(_meter, _wanted_meter)
+  elseif _meter < _wanted_meter then
+    _meter = _meter + 6
+    _meter = math.min(_meter, _wanted_meter)
+  end
+
+  local _wanted_gauge = _meter
+
+  if _wanted_gauge ~= _previous_gauge then
+    memory.writebyte(_player_obj.addresses.gauge_addr, _wanted_gauge)
+  end
+end
+
+function gamestate.refill_meter_max(_player_obj)
+  local _previous_gauge = memory.readbyte(_player_obj.addresses.gauge_addr)
+
+  local _wanted_gauge = _player_obj.max_meter_gauge
+
+  if _wanted_gauge ~= _previous_gauge then
+    memory.writebyte(_player_obj.addresses.gauge_addr, _wanted_gauge)
+  end
 end
 
 -- - 0 is no player

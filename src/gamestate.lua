@@ -273,65 +273,11 @@ function write_player_vars(_player_obj)
 
   -- METER
   if gamestate.is_in_match and not is_menu_open and not _player_obj.is_in_timed_sa then
-    -- If the SA is a timed SA, the gauge won't go back to 0 when it reaches max. We have to make special cases for it
-    local _is_timed_sa = character_specific[_player_obj.char_str].timed_sa[_player_obj.selected_sa]
-
     if training_settings.meter_mode == 3 then
-      local _previous_meter_count = memory.readbyte(_player_obj.addresses.meter_addr[2])
-      local _previous_meter_count_slave = memory.readbyte(_player_obj.addresses.meter_addr[1])
-      if _previous_meter_count ~= _player_obj.max_meter_count and _previous_meter_count_slave ~= _player_obj.max_meter_count then
-        local _gauge_value = 0
-        if _is_timed_sa then
-          _gauge_value = _player_obj.max_meter_gauge
-        end
-        memory.writebyte(_player_obj.addresses.gauge_addr, _gauge_value)
-        memory.writebyte(_player_obj.addresses.meter_addr[2], _player_obj.max_meter_count)
-        memory.writebyte(_player_obj.addresses.meter_update_flag, 0x01)
-      end
+      gamestate.refill_meter_max(_player_obj)
     elseif training_settings.meter_mode == 2 then
       if _player_obj.is_idle and _player_obj.idle_time > training_settings.meter_refill_delay then
-        local _previous_gauge = memory.readbyte(_player_obj.addresses.gauge_addr)
-        local _previous_meter_count = memory.readbyte(_player_obj.addresses.meter_addr[2])
-        local _previous_meter_count_slave = memory.readbyte(_player_obj.addresses.meter_addr[1])
-
-        if _previous_meter_count == _previous_meter_count_slave then
-          local _meter = 0
-          -- If the SA is a timed SA, the gauge won't go back to 0 when it reaches max
-          if _is_timed_sa then
-            _meter = _previous_gauge
-          else
-             _meter = _previous_gauge + _player_obj.max_meter_gauge * _previous_meter_count
-          end
-
-          if _meter > _wanted_meter then
-            _meter = _meter - 6
-            _meter = math.max(_meter, _wanted_meter)
-          elseif _meter < _wanted_meter then
-            _meter = _meter + 6
-            _meter = math.min(_meter, _wanted_meter)
-          end
-
-          local _wanted_gauge = _meter % _player_obj.max_meter_gauge
-          local _wanted_meter_count = math.floor(_meter / _player_obj.max_meter_gauge)
-          local _previous_meter_count = memory.readbyte(_player_obj.addresses.meter_addr[2])
-          local _previous_meter_count_slave = memory.readbyte(_player_obj.addresses.meter_addr[1])
-
-          if character_specific[_player_obj.char_str].timed_sa[_player_obj.selected_sa] and _wanted_meter_count == 1 and _wanted_gauge == 0 then
-            _wanted_gauge = _player_obj.max_meter_gauge
-          end
-
-          --if _player_obj.id == 1 then
-          --  print(string.format("%d: %d/%d/%d (%d/%d)", _wanted_meter, _wanted_gauge, _wanted_meter_count, _player_obj.max_meter_gauge, _previous_gauge, _previous_meter_count))
-          --end
-
-          if _wanted_gauge ~= _previous_gauge then
-            memory.writebyte(_player_obj.addresses.gauge_addr, _wanted_gauge)
-          end
-          if _previous_meter_count ~= _wanted_meter_count then
-            memory.writebyte(_player_obj.addresses.meter_addr[2], _wanted_meter_count)
-            memory.writebyte(_player_obj.addresses.meter_update_flag, 0x01)
-          end
-        end
+        gamestate.refill_meter(_player_obj, _wanted_meter)
       end
     end
   end
