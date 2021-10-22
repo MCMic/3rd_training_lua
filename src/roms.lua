@@ -7,6 +7,7 @@ supported_roms = {
     p2input = {x = 310, y = 34},
     inputhistory = {x = 4, y = 49, step_y = 10},
     parry = true,
+    highjump = true,
     characters =
     {
       "gill",
@@ -40,6 +41,7 @@ supported_roms = {
     p2input = {x = 310, y = 34},
     inputhistory = {x = 4, y = 49, step_y = 10},
     parry = true,
+    highjump = true,
     characters =
     {
       "gill",
@@ -73,6 +75,7 @@ supported_roms = {
     p2input = {x = 322, y = 44},
     inputhistory = {x = 4, y = 65, step_y = 9},
     parry = false,
+    highjump = false,
     characters =
     {
       "ryu",
