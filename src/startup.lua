@@ -2,8 +2,8 @@ require("src/roms")
 
 script_version = "v0.10 dev"
 fc_version = "v2.0.97.44"
-saved_path = "saved/"
 rom_name = emu.romname()
+saved_path = "saved/" .. rom_name .. "/"
 
 if supported_roms[rom_name] ~= nil then
   rom = supported_roms[rom_name]
