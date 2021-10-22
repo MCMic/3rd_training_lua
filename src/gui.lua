@@ -1,4 +1,142 @@
+pose = {
+  "normal",
+  "crouching",
+  "jumping",
+}
+if rom.highjump then
+  table.insert(pose, "highjumping")
+end
 
+stick_gesture = {
+  "none",
+  "QCF",
+  "QCB",
+  "HCF",
+  "HCB",
+  "DPF",
+  "DPB",
+  "HCharge",
+  "VCharge",
+  "360",
+  "DQCF",
+  "720",
+  "forward",
+  "back",
+  "down",
+  "jump",
+  "super jump",
+  "forward jump",
+  "forward super jump",
+  "back jump",
+  "back super jump",
+  "back dash",
+  "forward dash",
+  "guard jump (See Readme)",
+  --"guard back jump",
+  --"guard forward jump",
+  "Shun Goku Satsu", -- Gouki hidden SA1
+  "Kongou Kokuretsu Zan", -- Gouki hidden SA2
+}
+if rom.is_4rd_strike then
+  table.insert(stick_gesture, "Demon Armageddon") -- Gouki SA3
+end
+
+button_gesture =
+{
+  "none",
+  "recording",
+  "LP",
+  "MP",
+  "HP",
+  "EXP",
+  "LK",
+  "MK",
+  "HK",
+  "EXK",
+  "LP+LK",
+  "MP+MK",
+  "HP+HK",
+}
+
+fast_wakeup_mode =
+{
+  "never",
+  "always",
+  "random",
+}
+
+blocking_style =
+{
+  "block",
+}
+if (rom.parry) then
+  table.insert(blocking_style, "parry")
+  table.insert(blocking_style, "red parry")
+end
+
+blocking_mode =
+{
+  "never",
+  "always",
+  "first hit",
+  "random",
+}
+
+tech_throws_mode =
+{
+  "never",
+  "always",
+  "random",
+}
+
+hit_type =
+{
+  "normal",
+  "low",
+  "overhead",
+}
+
+life_mode =
+{
+  "no refill",
+  "refill",
+  "infinite"
+}
+
+meter_mode =
+{
+  "no refill",
+  "refill",
+  "infinite"
+}
+
+stun_mode =
+{
+  "normal",
+  "no stun",
+  "delayed reset"
+}
+
+standing_state =
+{
+  "knockeddown",
+  "standing",
+  "crouched",
+  "airborne",
+}
+
+players = {
+  "Player 1",
+  "Player 2",
+}
+
+special_training_mode = {
+  "none",
+  "charge",
+}
+if (rom.parry) then
+  table.insert(special_training_mode, 2, "parry")
+end
 
 life_refill_delay_item = integer_menu_item("Life refill delay", training_settings, "life_refill_delay", 1, 100, false, 20)
 life_refill_delay_item.is_disabled = function()
