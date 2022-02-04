@@ -51,5 +51,5 @@ local attacks = {
 }
 
 function missionDosukoi()
-  missionAttacks("Dosukoi the attack", attacks)
+  missionAttacks("Dosukoi the attack", attacks, "dosukoi")
 end

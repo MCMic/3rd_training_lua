@@ -24,6 +24,7 @@ require("src/gamestate")
 require("src/frame_advantage")
 require("src/character_select")
 require("src/input")
+require("src/ssf2xjr1/honda_missions/mission")
 require("src/ssf2xjr1/honda_missions/common")
 require("src/ssf2xjr1/honda_missions/dragons")
 require("src/ssf2xjr1/honda_missions/supers")
@@ -41,6 +42,25 @@ debug_settings = {
   debug_move = "",
 }
 
+missions = {
+  {
+    id = "dragons",
+    fn = missionPunishDragons,
+    title = "Tame the dragons",
+  },
+  {
+    id = "supers",
+    fn = missionPunishSupers,
+    title = "Punish the supers",
+  },
+  {
+    id = "dosukoi",
+    fn = missionDosukoi,
+    title = "Dosukoi the reckless",
+  },
+  -- TODO mission to go forward in lots of projectiles with neutral jump + bulldog
+}
+
 mission_scores = {}
 mission_scores_file = 'honda_missions.json'
 
@@ -48,6 +68,8 @@ mission_scores_file = 'honda_missions.json'
 function save_mission_scores()
   if not write_object_to_json_file(mission_scores, saved_path..mission_scores_file) then
     print(string.format("Error: Failed to save mission scores to \"%s\"", saved_path..mission_scores_file))
+  else
+    print(string.format("Saved mission scores to \"%s\"", saved_path..mission_scores_file))
   end
 end
 
@@ -58,21 +80,9 @@ function load_mission_scores()
   end
 end
 
--- GUI DECLARATION
-
-main_menu = make_menu(
-  50, 50, 383 - 50, 223 - 50, -- screen size 383,223
-  {
-    button_menu_item("Punish the dragons", missionPunishDragons),
-    button_menu_item("Punish the supers", missionPunishSupers),
-    button_menu_item("Dosukoi the reckless", missionDosukoi),
-    -- also mission to go forward in lots of projectiles with neutral jump + bulldog
-  }
-)
-
 function retryMission()
   mission = previous_mission
-  mission.init()
+  mission:init()
 end
 
 function openMainMenu()
@@ -81,21 +91,65 @@ function openMainMenu()
   menu_stack_push(main_menu)
 end
 
-lost_menu = make_menu(
-  --~ 23, 15, 360, 195, -- screen size 383,223
-  40, 170, 383 - 40, 223 - 10, -- screen size 383,223
-  {
-    button_menu_item("Retry mission", retryMission),
-    button_menu_item("Back to menu", openMainMenu),
-  }
-)
+function missionWon()
+  -- TODO enregistrer les missions gagnées
+  -- TODO afficher dans le menu les missions gagnées
+  print("You won")
+  previous_mission = mission
+  mission:updateScore(mission_scores)
+  mission = nil
+  save_mission_scores()
+  savestate.load(savestate.create("data/"..rom_name.."/savestates/ehonda_won.fs"))
+  is_menu_open = true
+  menu_stack_push(win_menu)
+end
 
-win_menu = make_menu(
-  40, 170, 383 - 40, 223 - 10, -- screen size 383,223
-  {
-    button_menu_item("Back to menu", openMainMenu),
-  }
-)
+function missionLost()
+  print("You lost")
+  previous_mission = mission
+  mission:updateScore(mission_scores)
+  mission = nil
+  save_mission_scores()
+  savestate.load(savestate.create("data/"..rom_name.."/savestates/ehonda_lost.fs"))
+  is_menu_open = true
+  menu_stack_push(lost_menu)
+end
+
+-- GUI DECLARATION
+
+function buildMenus()
+  local buttons = {}
+  for i,mission in ipairs(missions) do
+    local _text = mission.title
+    print(mission.id)
+    print(mission_scores[mission.id])
+    if (mission_scores[mission.id] ~= nil and mission_scores[mission.id] > 0) then
+      _text = _text .. " - " .. mission_scores[mission.id]
+    end
+    print(_text)
+    buttons[i] = button_menu_item(_text, mission.fn)
+  end
+
+  main_menu = make_menu(
+    50, 50, 383 - 50, 223 - 50, -- screen size 383,223
+    buttons
+  )
+
+  lost_menu = make_menu(
+    40, 170, 383 - 40, 223 - 10, -- screen size 383,223
+    {
+      button_menu_item("Retry mission", retryMission),
+      button_menu_item("Back to menu", openMainMenu),
+    }
+  )
+
+  win_menu = make_menu(
+    40, 170, 383 - 40, 223 - 10, -- screen size 383,223
+    {
+      button_menu_item("Back to menu", openMainMenu),
+    }
+  )
+end
 
 -- PROGRAM
 
@@ -113,10 +167,8 @@ function on_start()
   load_frame_data()
   emu.speedmode("normal")
 
-  --~ savestate.load(savestate.create("data/"..rom_name.."/savestates/honda_mission1.fs"))
   is_menu_open = true
   menu_stack_push(main_menu)
-  --~ missionPunishSupers()
 
   --~ if not developer_mode then
     --~ start_character_select_sequence()
@@ -131,13 +183,11 @@ function before_frame()
   -- gamestate
   gamestate.read()
 
-  local _write_game_vars_settings =
-  {
+  gamestate.write_game_vars({
     freeze = is_menu_open,
     infinite_time = false,
     music_volume = training_settings.music_volume,
-  }
-  gamestate.write_game_vars(_write_game_vars_settings)
+  })
 
   write_player_vars(gamestate.player_objects[1])
   write_player_vars(gamestate.player_objects[2])
@@ -167,32 +217,15 @@ function before_frame()
     frame_advantage_reset()
   end
 
-  -- character select
-  --~ update_character_select(_input, training_settings.fast_forward_intro)
-
-  previous_input = _input
-
   if (mission ~= nil) then
       --~ print(memory.readwordsigned(addresses.players[1].pos_x))
       --~ print(memory.readwordsigned(addresses.players[2].pos_x))
-    if mission.iswon() then
-      -- TODO enregistrer les missions gagnées
-      -- TODO afficher dans le menu les missions gagnées
-      print("You won")
-      previous_mission = mission -- ?
-      mission = nil
-      savestate.load(savestate.create("data/"..rom_name.."/savestates/ehonda_won.fs"))
-      is_menu_open = true
-      menu_stack_push(win_menu)
-    elseif mission.islost() then
-      previous_mission = mission
-      mission = nil
-      print("You lost")
-      savestate.load(savestate.create("data/"..rom_name.."/savestates/ehonda_lost.fs"))
-      is_menu_open = true
-      menu_stack_push(lost_menu)
+    if mission:iswon() then
+      missionWon()
+    elseif mission:islost() then
+      missionLost()
     else
-      mission.logic(_input)
+      mission:logic(_input)
     end
   end
 
@@ -214,39 +247,8 @@ function on_gui()
     clear_printed_geometry()
   end
 
-  draw_character_select()
-
   if gamestate.is_in_match then
-
     display_draw_printed_geometry()
-
-    -- hitboxes
-    --~ if training_settings.display_hitboxes then
-      --~ display_draw_hitboxes()
-    --~ end
-
-    -- input history
-    --~ if training_settings.display_p1_input_history_dynamic and training_settings.display_p1_input_history then
-      --~ if gamestate.player_objects[1].pos_x < 320 then
-        --~ input_history_draw(input_history[1], screen_width - rom.inputhistory.x, rom.inputhistory.y, true)
-      --~ else
-        --~ input_history_draw(input_history[1], rom.inputhistory.x, rom.inputhistory.y, false)
-      --~ end
-    --~ else
-      --~ if training_settings.display_p1_input_history then input_history_draw(input_history[1], rom.inputhistory.x, rom.inputhistory.y, false) end
-      --~ if training_settings.display_p2_input_history then input_history_draw(input_history[2], screen_width - rom.inputhistory.x, rom.inputhistory.y, true) end
-    --~ end
-
-    --~ for i,_player_obj in pairs(gamestate.player_objects) do
-      --~ gui.text(10, 10*_player_obj.id, string.format("%04X %04X",
-        --~ memory.readword(_player_obj.addresses.base + 0x392),
-        --~ memory.readword(_player_obj.addresses.base + 0x394)
-      --~ ), text_default_color, text_default_border_color)
-    --~ end
-    --~ gui.text(10, 100, string.format("%d %d",
-      --~ memory.readword(addresses.global.screen_x),
-      --~ memory.readword(addresses.global.screen_y)
-    --~ ), text_default_color, text_default_border_color)
   end
 
   if log_enabled then
@@ -299,7 +301,7 @@ function on_gui()
   end
 
   if (mission ~= nil) then
-    mission.ongui()
+    mission:ongui()
   end
 
   gui.box(0,0,0,0,0,0) -- if we don't draw something, what we drawed from last frame won't be cleared
@@ -307,6 +309,7 @@ end
 
 -- registers
 load_mission_scores()
+buildMenus()
 emu.registerstart(on_start)
 emu.registerbefore(before_frame)
 gui.register(on_gui)

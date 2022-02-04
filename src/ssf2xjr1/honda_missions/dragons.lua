@@ -1,12 +1,12 @@
 
-local function step1Logic(_input)
+local function step1Logic(self, _input)
   -- substate 6 est nécessaire mais c’est un peu bourrin
   if (
     (
       gamestate.player_objects[2].is_idle or
       (((gamestate.player_objects[2].substate == 0x06) or (gamestate.player_objects[2].substate == 0x08)) and (gamestate.player_objects[2].posture == 0x0C))
     ) and
-    not mission.dragon
+    not self.dragon
   ) then
     -- If player is idle or falling down from previous dragon, input a dragon
     do_special_move (_input, gamestate.player_objects[2], character_specific.ken.specials[2], 1)
@@ -17,15 +17,15 @@ local function step1Logic(_input)
     --~ print(memory.readword(gamestate.player_objects[2].addresses.base + 0x392))
     --~ print(memory.readword(gamestate.player_objects[2].addresses.base + 0x394))
     -- Boolean to avoid inputing dragon again on next frame
-    mission.dragon = true
+    self.dragon = true
   else
-    mission.dragon = false
+    self.dragon = false
   end
 end
 
-local function step2Logic(_input)
-  if (mission.dragon) then
-    mission.dragon = false
+local function step2Logic(self, _input)
+  if (self.dragon) then
+    self.dragon = false
     return
   end
   local _dragon = false
@@ -52,7 +52,7 @@ local function step2Logic(_input)
   end
   if (_dragon) then
     do_special_move (_input, gamestate.player_objects[2], character_specific.ken.specials[2], _variation)
-    mission.dragon = true
+    self.dragon = true
   else
     -- input block
     _input[gamestate.player_objects[2].prefix.." "..sequence_input_to_key("back", gamestate.player_objects[2].flip_input)] = true
@@ -63,85 +63,61 @@ end
 function missionPunishDragons()
   -- first part should be spam
   -- second part random and reaction
-  mission = {
-    init = function ()
-      mission.next = false
-      mission.punishing = false
-      mission.punished = 0
-      mission.dragon = false
-      mission.step = 1
-      mission.lost = false
-      mission.wait = 0
-      is_menu_open = false
-      menu_stack_clear()
+  mission = Mission:new({
+    id = "dragons",
+    init = function (self)
+      Mission.init(self)
+      self.next = false
+      self.punishing = false
+      self.punished = 0
+      self.dragon = false
+      self.step = 1
       savestate.load(savestate.create("data/"..rom_name.."/savestates/honda_oldken.fs"))
     end,
-    logic = function (_input)
-      if (not gamestate.is_in_match) then
-        return
-      end
-      if (mission.wait > 0) then
-        mission.wait = mission.wait - 1
-        return
-      end
-      if (mission.next) then
+    mainLogic = function (self, _input)
+      if (self.next) then
         savestate.load(savestate.create("data/"..rom_name.."/savestates/honda_oldken.fs"))
-        mission.step = mission.step + 1
-        mission.punished = 0
-        mission.next = false
+        self.step = self.step + 1
+        self.punished = 0
+        self.next = false
+        return
       end
-      if (mission.step == 1) then
-        step1Logic(_input)
+      if (self.step == 1) then
+        step1Logic(self, _input)
       else
-        step2Logic(_input)
+        step2Logic(self, _input)
       end
       if ((gamestate.player_objects[2].posture == 0xE) or (gamestate.player_objects[2].posture == 0x14)) then
         -- If player is hit or thrown, count a punish
-        if (not mission.punishing) then
-          mission.punished = mission.punished + 1
-          mission.punishing = true
-          if (mission.iswon()) then
+        if (not self.punishing) then
+          self.punished = self.punished + 1
+          self.punishing = true
+          if ((self.step >= 2) and (self.punished >= 5)) then
             -- delay before winning screen
-            mission.wait = 50
+            self.wait = 50
+            self.won = true
           end
         end
       else
-        mission.punishing = false
+        self.punishing = false
       end
-      if ((mission.punished >= 5) and (mission.step == 1)) then
-        mission.next = true
-        mission.wait = 50
+      if ((self.punished >= 5) and (self.step == 1)) then
+        self.next = true
+        self.wait = 50
         return
       end
       if (gamestate.player_objects[1].life < gamestate.player_objects[1].max_life) then
         -- If you lose life you lose
-        mission.wait = 50
-        mission.lost = true
+        self.wait = 50
+        self.lost = true
       end
     end,
-    ongui = function ()
-      local _help = string.format("Punished dragons: %d/5 (step %d/2)", mission.punished, mission.step)
-      gui.box(1, 1, string.len(_help) * 4.1 + 2, 15, gui_box_bg_color, gui_box_outline_color)
-      gui.text(5, 5, _help)
+    formatHelp = function (self)
+      return string.format("Punished dragons: %d/5 (step %d/2)", self.punished, self.step)
     end,
-    islost = function ()
-      if (not gamestate.is_in_match) then
-        return false
-      end
-      if (mission.wait > 0) then
-        return false
-      end
-      return mission.lost
-    end,
-    iswon = function ()
-      if (not gamestate.is_in_match) then
-        return false
-      end
-      if (mission.wait > 0) then
-        return false
-      end
-      return ((mission.step >= 2) and (mission.punished >= 5))
-    end,
-  }
-  mission.init()
+    getScore = function(self)
+      return (self.step - 1) * 5 + self.punished
+    end
+  })
+  mission:init()
 end

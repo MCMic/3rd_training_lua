@@ -104,5 +104,5 @@ local supers = {
 }
 
 function missionPunishSupers()
-  missionAttacks("Punish the super", supers)
+  missionAttacks("Punish the super", supers, "supers")
 end
