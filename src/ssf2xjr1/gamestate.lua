@@ -286,7 +286,7 @@ function gamestate.read_player_vars(_player_obj)
 
   -- ATTACKING
   local _previous_is_attacking = _player_obj.is_attacking or false
-  _player_obj.is_attacking = (_player_obj.posture == 0x0A or _player_obj.posture == 0x0C) -- I think this does not account for air attack
+  _player_obj.is_attacking = (_player_obj.posture == 0x0A or _player_obj.posture == 0x0C or (_player_obj.posture == 0x04 and _player_obj.substate == 0x06))
   _player_obj.has_just_attacked =  _player_obj.is_attacking and not _previous_is_attacking
   if _debug_state_variables and _player_obj.has_just_attacked then print(string.format("%d - %s attacked", gamestate.frame_number, _player_obj.prefix)) end
 
@@ -545,7 +545,7 @@ function gamestate.read_player_vars(_player_obj)
 
   -- LANDING
   local _previous_is_in_jump_startup = _player_obj.is_in_jump_startup or false
-  _player_obj.is_in_jump_startup = _player_obj.movement_type2 == 0x0C and _player_obj.movement_type == 0x00 and not _player_obj.is_blocking
+  _player_obj.is_in_jump_startup = _player_obj.posture == 0x04 and _player_obj.substate == 0x00 and not _player_obj.is_blocking
   _player_obj.previous_standing_state = _player_obj.standing_state or 0
   if (_player_obj.airborn == 0x00) then
     _player_obj.standing_state = 1
@@ -557,26 +557,8 @@ function gamestate.read_player_vars(_player_obj)
   if _player_obj.debug_standing_state and _player_obj.previous_standing_state ~= _player_obj.standing_state then print(string.format("%d - %s standing state changed (%d > %d)", gamestate.frame_number, _player_obj.prefix, _player_obj.previous_standing_state, _player_obj.standing_state)) end
 
   -- AIR RECOVERY STATE
-  local _debug_air_recovery = false
-  local _previous_is_in_air_recovery = _player_obj.is_in_air_recovery or false
-  local _r1 = memory.readbyte(_player_obj.base + 0x12F)
-  local _r2 = memory.readbyte(_player_obj.base + 0x3C7)
-  _player_obj.is_in_air_recovery = _player_obj.standing_state == 0 and _r1 == 0 and _r2 == 0x06 and _player_obj.pos_y ~= 0
-  _player_obj.has_just_entered_air_recovery = not _previous_is_in_air_recovery and _player_obj.is_in_air_recovery
-
-  if not _previous_is_in_air_recovery and _player_obj.is_in_air_recovery then
-    log(_player_obj.prefix, "fight", string.format("air recovery 1"))
-    if _debug_air_recovery then
-      print(string.format("%s entered air recovery", _player_obj.prefix))
-    end
-  end
-  if _previous_is_in_air_recovery and not _player_obj.is_in_air_recovery then
-    log(_player_obj.prefix, "fight", string.format("air recovery 0"))
-    if _debug_air_recovery then
-      print(string.format("%s exited air recovery", _player_obj.prefix))
-    end
-  end
-
+  _player_obj.is_in_air_recovery = false
+  _player_obj.has_just_entered_air_recovery = false
 
   -- IS IDLE
   local _previous_is_idle = _player_obj.is_idle or false
@@ -611,7 +593,7 @@ function gamestate.read_player_vars(_player_obj)
     _player_obj.previous_is_wakingup = _player_obj.is_wakingup or false
     _player_obj.is_wakingup = _player_obj.is_wakingup or false
     _player_obj.wakeup_time = _player_obj.wakeup_time or 0
-    if _player_obj.previous_airborn == 0xFF and _player_obj.airborn == 0 then -- and _player_obj.standing_state == 0
+    if _player_obj.previous_airborn == 0xFF and _player_obj.airborn == 0 and _player_obj.posture == 0x0E then
       _player_obj.is_wakingup = true
       _player_obj.is_past_wakeup_frame = false
       _player_obj.wakeup_time = 0

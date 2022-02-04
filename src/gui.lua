@@ -194,6 +194,15 @@ change_characters_item.is_disabled = function()
   return rom_name ~= "sfiii3nr1"
 end
 
+blocking_style_item = list_menu_item("Blocking Style", training_settings, "blocking_style", blocking_style)
+blocking_style_item.is_disabled = function()
+  return #blocking_style <= 1
+end
+fastwakeup_item = list_menu_item("Fast Wake Up", training_settings, "fast_wakeup_mode", fast_wakeup_mode)
+fastwakeup_item.is_disabled = function()
+  return not rom.fastwakeup
+end
+
 main_menu = make_multitab_menu(
   23, 15, 360, 195, -- screen size 383,223
   {
@@ -201,13 +210,13 @@ main_menu = make_multitab_menu(
       name = "Dummy",
       entries = {
         list_menu_item("Pose", training_settings, "pose", pose),
-        list_menu_item("Blocking Style", training_settings, "blocking_style", blocking_style),
+        blocking_style_item,
         hits_before_red_parry_item,
         list_menu_item("Blocking", training_settings, "blocking_mode", blocking_mode),
         list_menu_item("Tech Throws", training_settings, "tech_throws_mode", tech_throws_mode),
         list_menu_item("Counter-Attack Move", training_settings, "counter_attack_stick", stick_gesture),
         list_menu_item("Counter-Attack Action", training_settings, "counter_attack_button", button_gesture),
-        list_menu_item("Fast Wake Up", training_settings, "fast_wakeup_mode", fast_wakeup_mode),
+        fastwakeup_item,
       }
     },
     {

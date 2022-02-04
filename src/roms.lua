@@ -8,6 +8,7 @@ supported_roms = {
     inputhistory = {x = 4, y = 49, step_y = 10},
     parry = true,
     highjump = true,
+    fastwakeup = true,
     characters =
     {
       "gill",
@@ -42,6 +43,7 @@ supported_roms = {
     inputhistory = {x = 4, y = 49, step_y = 10},
     parry = true,
     highjump = true,
+    fastwakeup = true,
     characters =
     {
       "gill",
@@ -76,6 +78,7 @@ supported_roms = {
     inputhistory = {x = 4, y = 65, step_y = 9},
     parry = false,
     highjump = false,
+    fastwakeup = false,
     characters =
     {
       "ryu",
